@@ -284,8 +284,9 @@ ifeq ($(HOST_OS),linux)
     endif
   endif
 endif
+WITH_DEXPREOPT_COMP=true
 #WITH_DEXPREOPT_PIC := true
-#DONT_DEXPREOPT_PREBUILTS := true
+DONT_DEXPREOPT_PREBUILTS := true
 
 # Final ZIP type
 BLOCK_BASED_OTA := true
