@@ -12,13 +12,13 @@ function delos3geur_select
 lunch cm_delos3geur-userdebug
 make -j4 bacon
 }
-function arubalsim
+function arubaslim
 {
-lunch cm_arubalsim-userdebug
+lunch cm_arubaslim-userdebug
 make -j4 bacon
 }
-function arubalsim_select
+function arubaslim_select
 {
-lunch cm_arubalsim-userdebug
+lunch cm_arubaslim-userdebug
 make -j4 bacon
 }
