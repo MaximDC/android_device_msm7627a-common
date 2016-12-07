@@ -38,14 +38,7 @@ for patch in `find -type f -name '*.patch'|cut -d / -f 2-|sort`; do
 			else
 				echo -n ', PATCH MISMATCH!'
 				echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-				sed '0,/^$/d' $absolute_patch_path|head -n -3  > /tmp/patch
-				git show --stat $commit_hash -p --pretty=format:%b > /tmp/commit
-				diff -u /tmp/patch /tmp/commit
-				rm /tmp/patch /tmp/commit
-				echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-				echo ' Resetting branch!'
-				git checkout $commit_hash~1
-				git am $absolute_patch_path || git am --abort
+
 			fi
 		else
 			echo "Unable to get commit hash for '$title'! Something went wrong!"

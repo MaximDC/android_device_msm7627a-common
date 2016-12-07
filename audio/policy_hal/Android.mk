@@ -1,3 +1,4 @@
+ifneq ($(USE_LEGACY_AUDIO_POLICY), 1)
 ifeq ($(USE_CUSTOM_AUDIO_POLICY), 1)
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
@@ -24,14 +25,23 @@ LOCAL_SHARED_LIBRARIES := \
     libserviceutility
 
 LOCAL_STATIC_LIBRARIES := \
-    libmedia_helper
+    libmedia_helper \
 
-ifeq ($(strip $(QCOM_FM_ENABLED)),true)
-LOCAL_CFLAGS += -DQCOM_FM_ENABLED
+ifeq ($(strip $(AUDIO_FEATURE_ENABLED_HDMI_SPK)),true)
+LOCAL_CFLAGS += -DAUDIO_EXTN_HDMI_SPK_ENABLED
+endif
+
+ifneq ($(strip $(AUDIO_FEATURE_ENABLED_PROXY_DEVICE)),false)
+LOCAL_CFLAGS += -DAUDIO_EXTN_AFE_PROXY_ENABLED
+endif
+
+ifeq ($(strip $(AUDIO_FEATURE_ENABLED_FM_POWER_OPT)),true)
+LOCAL_CFLAGS += -DFM_POWER_OPT
 endif
 
 LOCAL_MODULE := libaudiopolicymanager
 
 include $(BUILD_SHARED_LIBRARY)
 
+endif
 endif

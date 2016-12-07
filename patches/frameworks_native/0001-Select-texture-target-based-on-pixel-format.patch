@@ -1,4 +1,4 @@
-From 339468caae52b0aa0ce802e89e2da35cd077a642 Mon Sep 17 00:00:00 2001
+From fad726e622451818a08113c84c3eb338304769f1 Mon Sep 17 00:00:00 2001
 From: Kyle Harrison <khwebmail@gmail.com>
 Date: Fri, 13 Feb 2015 20:16:18 +0000
 Subject: [PATCH] Select texture target based on pixel format
@@ -20,15 +20,15 @@ Change-Id: I6675eec6802caa0f862dd551608e4cc92a6b61bb
  services/surfaceflinger/Android.mk                 |  4 +++
  services/surfaceflinger/Layer.cpp                  |  6 ++++
  .../RenderEngine/GLES11RenderEngine.cpp            |  6 ++++
- services/surfaceflinger/SurfaceFlingerConsumer.cpp | 33 ++++++++++++++++++++++
- services/surfaceflinger/SurfaceFlingerConsumer.h   |  8 ++++++
- 7 files changed, 67 insertions(+)
+ services/surfaceflinger/SurfaceFlingerConsumer.cpp | 34 ++++++++++++++++++++++
+ services/surfaceflinger/SurfaceFlingerConsumer.h   | 10 ++++++-
+ 7 files changed, 69 insertions(+), 1 deletion(-)
 
 diff --git a/include/gui/GLConsumer.h b/include/gui/GLConsumer.h
-index c35c7be..3a63a0e 100644
+index 6267625..2aa13ba 100644
 --- a/include/gui/GLConsumer.h
 +++ b/include/gui/GLConsumer.h
-@@ -419,7 +419,13 @@ private:
+@@ -436,7 +436,13 @@ private:
      // glCopyTexSubImage to read from the texture.  This is a hack to work
      // around a GL driver limitation on the number of FBO attachments, which the
      // browser's tile cache exceeds.
@@ -43,11 +43,11 @@ index c35c7be..3a63a0e 100644
      // EGLSlot contains the information and object references that
      // GLConsumer maintains about a BufferQueue buffer slot.
 diff --git a/libs/gui/Android.mk b/libs/gui/Android.mk
-index 76aec6e..40d77ac 100644
+index 493523a..386eec8 100644
 --- a/libs/gui/Android.mk
 +++ b/libs/gui/Android.mk
-@@ -95,6 +95,10 @@ ifeq ($(TARGET_NO_SENSOR_PERMISSION_CHECK),true)
- LOCAL_CPPFLAGS += -DNO_SENSOR_PERMISSION_CHECK
+@@ -101,6 +101,10 @@ ifeq ($(TARGET_FORCE_SCREENSHOT_CPU_PATH),true)
+ LOCAL_CPPFLAGS += -DFORCE_SCREENSHOT_CPU_PATH
  endif
  
 +ifeq ($(BOARD_ADRENO_DECIDE_TEXTURE_TARGET),true)
@@ -58,11 +58,11 @@ index 76aec6e..40d77ac 100644
  
  ifeq (,$(ONE_SHOT_MAKEFILE))
 diff --git a/services/surfaceflinger/Android.mk b/services/surfaceflinger/Android.mk
-index 6a90083..a1d9b65 100644
+index e86c102..5f55d03 100644
 --- a/services/surfaceflinger/Android.mk
 +++ b/services/surfaceflinger/Android.mk
-@@ -99,6 +99,10 @@ ifeq ($(BOARD_USE_BGRA_8888),true)
-     LOCAL_CFLAGS += -DUSE_BGRA_8888
+@@ -113,6 +113,10 @@ else
+     LOCAL_CFLAGS += -DMAX_VIRTUAL_DISPLAY_DIMENSION=0
  endif
  
 +ifeq ($(BOARD_ADRENO_DECIDE_TEXTURE_TARGET),true)
@@ -70,32 +70,33 @@ index 6a90083..a1d9b65 100644
 +endif
 +
  LOCAL_CFLAGS += -fvisibility=hidden -Werror=format
- LOCAL_CFLAGS += -std=c++11
+ LOCAL_CFLAGS += -std=c++14
  
 diff --git a/services/surfaceflinger/Layer.cpp b/services/surfaceflinger/Layer.cpp
-index 6dd8bad..0c90f55 100644
+index d1afd55..7631382 100644
 --- a/services/surfaceflinger/Layer.cpp
 +++ b/services/surfaceflinger/Layer.cpp
-@@ -1371,8 +1371,14 @@ Region Layer::latchBuffer(bool& recomputeVisibleRegions)
-             maxFrameNumber = mLastFrameNumberReceived;
-         }
- 
+@@ -2036,9 +2036,15 @@ Region Layer::latchBuffer(bool& recomputeVisibleRegions)
+         // BufferItem's that weren't actually queued. This can happen in shared
+         // buffer mode.
+         bool queuedBuffer = false;
 +#ifdef DECIDE_TEXTURE_TARGET
 +        status_t updateResult = mSurfaceFlingerConsumer->updateTexImage(&r,
-+                mFlinger->mPrimaryDispSync, maxFrameNumber, &mTexture);
++                mFlinger->mPrimaryDispSync, &mTexture,&mAutoRefresh, &queuedBuffer,
++                mLastFrameNumberReceived);
 +#else
          status_t updateResult = mSurfaceFlingerConsumer->updateTexImage(&r,
-                 mFlinger->mPrimaryDispSync, maxFrameNumber);
+                 mFlinger->mPrimaryDispSync, &mAutoRefresh, &queuedBuffer,
+                 mLastFrameNumberReceived);
 +#endif
-+
          if (updateResult == BufferQueue::PRESENT_LATER) {
              // Producer doesn't want buffer to be displayed yet.  Signal a
              // layer update so we check again at the next opportunity.
 diff --git a/services/surfaceflinger/RenderEngine/GLES11RenderEngine.cpp b/services/surfaceflinger/RenderEngine/GLES11RenderEngine.cpp
-index 853a4eb..7295b6c 100644
+index 12f76f4..5cfbb09 100644
 --- a/services/surfaceflinger/RenderEngine/GLES11RenderEngine.cpp
 +++ b/services/surfaceflinger/RenderEngine/GLES11RenderEngine.cpp
-@@ -202,8 +202,14 @@ void GLES11RenderEngine::setupLayerTexturing(const Texture& texture) {
+@@ -265,8 +265,14 @@ void GLES11RenderEngine::setupLayerTexturing(const Texture& texture) {
      glMatrixMode(GL_TEXTURE);
      glLoadMatrixf(texture.getMatrix().asArray());
      glMatrixMode(GL_MODELVIEW);
@@ -111,10 +112,10 @@ index 853a4eb..7295b6c 100644
  
  void GLES11RenderEngine::setupLayerBlackedOut() {
 diff --git a/services/surfaceflinger/SurfaceFlingerConsumer.cpp b/services/surfaceflinger/SurfaceFlingerConsumer.cpp
-index ed1f31b..4b976e0 100644
+index c71b3bc..0adea44 100644
 --- a/services/surfaceflinger/SurfaceFlingerConsumer.cpp
 +++ b/services/surfaceflinger/SurfaceFlingerConsumer.cpp
-@@ -27,13 +27,24 @@
+@@ -27,14 +27,26 @@
  #include <utils/NativeHandle.h>
  #include <utils/Trace.h>
  
@@ -129,18 +130,20 @@ index ed1f31b..4b976e0 100644
  
 +#ifdef DECIDE_TEXTURE_TARGET
 +status_t SurfaceFlingerConsumer::updateTexImage(BufferRejecter* rejecter,
-+        const DispSync& dispSync, uint64_t maxFrameNumber, Texture* mTexture)
++        const DispSync& dispSync, bool* autoRefresh, bool* queuedBuffer,
++        uint64_t maxFrameNumber, Texture* mTexture)
 +{
 +#else
  status_t SurfaceFlingerConsumer::updateTexImage(BufferRejecter* rejecter,
-         const DispSync& dispSync, uint64_t maxFrameNumber)
+         const DispSync& dispSync, bool* autoRefresh, bool* queuedBuffer,
+         uint64_t maxFrameNumber)
  {
 +#endif
      ATRACE_CALL();
      ALOGV("updateTexImage");
      Mutex::Autolock lock(mMutex);
-@@ -78,6 +89,28 @@ status_t SurfaceFlingerConsumer::updateTexImage(BufferRejecter* rejecter,
-         return BUFFER_REJECTED;
+@@ -86,6 +98,28 @@ status_t SurfaceFlingerConsumer::updateTexImage(BufferRejecter* rejecter,
+         *queuedBuffer = item.mQueuedBuffer;
      }
  
 +    #ifdef DECIDE_TEXTURE_TARGET
@@ -166,10 +169,10 @@ index ed1f31b..4b976e0 100644
 +#endif
 +
      // Release the previous buffer.
-     err = updateAndReleaseLocked(item);
-     if (err != NO_ERROR) {
+ #ifdef USE_HWC2
+     err = updateAndReleaseLocked(item, &mPendingRelease);
 diff --git a/services/surfaceflinger/SurfaceFlingerConsumer.h b/services/surfaceflinger/SurfaceFlingerConsumer.h
-index 779e5b7..6394aae 100644
+index 51b002f..ffa2f5b 100644
 --- a/services/surfaceflinger/SurfaceFlingerConsumer.h
 +++ b/services/surfaceflinger/SurfaceFlingerConsumer.h
 @@ -19,6 +19,9 @@
@@ -182,20 +185,23 @@ index 779e5b7..6394aae 100644
  
  namespace android {
  // ----------------------------------------------------------------------------
-@@ -56,8 +59,13 @@ public:
+@@ -57,10 +60,15 @@ public:
      // reject the newly acquired buffer.  Unlike the GLConsumer version,
      // this does not guarantee that the buffer has been bound to the GL
      // texture.
 +#ifdef DECIDE_TEXTURE_TARGET
 +    status_t updateTexImage(BufferRejecter* rejecter, const DispSync& dispSync,
-+            uint64_t maxFrameNumber = 0, Texture* mTexture = 0);
++            bool* autoRefresh, bool* queuedBuffer,
++            uint64_t maxFrameNumber = 0, Texture* mTexture = 0););
 +#else
      status_t updateTexImage(BufferRejecter* rejecter, const DispSync& dispSync,
+             bool* autoRefresh, bool* queuedBuffer,
              uint64_t maxFrameNumber = 0);
+-
 +#endif
- 
      // See GLConsumer::bindTextureImageLocked().
      status_t bindTextureImage();
+ 
 -- 
-2.8.0
+2.10.1
 

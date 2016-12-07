@@ -1,29 +1,29 @@
-From e1f2451c05473d6803ea3c215aebcb2852ee4232 Mon Sep 17 00:00:00 2001
+From 9ad89ad5c517e6f13b9834651d19177c340f8d56 Mon Sep 17 00:00:00 2001
 From: weritos6666 <weritos94@gmail.com>
 Date: Fri, 4 Mar 2016 14:15:34 +0500
 Subject: [PATCH] Fix_wifi_Hotspot
 
 ---
- server/SoftapController.cpp | 30 ++++--------------------------
- 1 file changed, 4 insertions(+), 26 deletions(-)
+ server/SoftapController.cpp | 26 ++++----------------------
+ 1 file changed, 4 insertions(+), 22 deletions(-)
 
 diff --git a/server/SoftapController.cpp b/server/SoftapController.cpp
-index b05118e..351562a 100755
+index 27ed684..9793248 100755
 --- a/server/SoftapController.cpp
 +++ b/server/SoftapController.cpp
 @@ -60,7 +60,7 @@ static const char HOSTAPD_DHCP_DIR[]    = "/data/misc/dhcp";
- #endif
  static const char HOSTAPD_CONF_FILE[]    = "/data/misc/wifi/hostapd.conf";
  static const char HOSTAPD_BIN_FILE[]    = "/system/bin/hostapd";
+ static const char HOSTAPD_SOCKETS_DIR[]    = "/data/misc/wifi/sockets";
 -static const char WIFI_HOSTAPD_GLOBAL_CTRL_IFACE[] = "/data/misc/wifi/hostapd/global";
-+//static const char WIFI_HOSTAPD_GLOBAL_CTRL_IFACE[] = "/data/misc/wifi/hostapd/global";
++/*static const char WIFI_HOSTAPD_GLOBAL_CTRL_IFACE[] = "/data/misc/wifi/hostapd/global";*/
  
- SoftapController::SoftapController(SocketListener *sl)
-     : mPid(0) {
-@@ -156,46 +156,25 @@ void *SoftapController::threadStart(void *obj){
- 
- int SoftapController::startSoftap() {
+ SoftapController::SoftapController()
+     : mPid(0) {}
+@@ -155,35 +155,17 @@ void *SoftapController::threadStart(void *obj){
+ int SoftapController::startSoftap(bool global_ctrl_iface, SocketClient *socketClient = NULL) {
      pid_t pid = 1;
+     DIR *dir = NULL;
 -    int ret;
  
      if (mPid) {
@@ -35,21 +35,14 @@ index b05118e..351562a 100755
 -        ALOGE("Wi-Fi entropy file was not created");
 -    }
 -
--    ret = wifi_start_fstman(true);
--    if (ret) {
+-    if ((pid = fork()) < 0) {
+-        ALOGE("fork failed (%s)", strerror(errno));
 -        return ResponseCode::ServiceStartFailed;
 -    }
 -
-     if ((pid = fork()) < 0) {
-         ALOGE("fork failed (%s)", strerror(errno));
--        wifi_stop_fstman(true);
-         return ResponseCode::ServiceStartFailed;
-     }
- 
      if (!pid) {
          ensure_entropy_file_exists();
--        if (is_fst_softap_enabled()) {
--            /* fstman needs hostapd global control interface */
+-        if (global_ctrl_iface) {
 -            ret = execl(HOSTAPD_BIN_FILE, HOSTAPD_BIN_FILE,
 -                        "-e", WIFI_ENTROPY_FILE, "-ddd",
 -                        "-g", WIFI_HOSTAPD_GLOBAL_CTRL_IFACE,
@@ -66,18 +59,6 @@ index b05118e..351562a 100755
              ALOGE("execl failed (%s)", strerror(errno));
          }
          ALOGE("SoftAP failed to start");
--        wifi_stop_fstman(true);
-         return ResponseCode::ServiceStartFailed;
-     } else {
-         mPid = pid;
-@@ -231,7 +210,6 @@ int SoftapController::stopSoftap() {
- 
-     mPid = 0;
-     ALOGD("SoftAP stopped successfully");
--    wifi_stop_fstman(true);
-     usleep(AP_BSS_STOP_DELAY);
-     return ResponseCode::SoftapStatusResult;
- }
 -- 
-1.9.1
+2.10.1
 
