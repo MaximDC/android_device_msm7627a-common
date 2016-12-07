@@ -498,17 +498,17 @@ static struct hw_module_methods_t qcom_ap_module_methods = {
 };
 
 struct qcom_ap_module HAL_MODULE_INFO_SYM = {
-    module: {
-        common: {
-            tag: HARDWARE_MODULE_TAG,
-            version_major: 1,
-            version_minor: 0,
-            id: AUDIO_POLICY_HARDWARE_MODULE_ID,
-            name: "QCOM Audio Policy HAL",
-            author: "The Linux Foundation",
-            methods: &qcom_ap_module_methods,
-            dso : NULL,
-            reserved : {0},
+    .module = {
+        .common = {
+            .tag = HARDWARE_MODULE_TAG,
+            .version_major = 1,
+            .version_minor = 0,
+            .id = AUDIO_POLICY_HARDWARE_MODULE_ID,
+            .name = "QCOM Audio Policy HAL",
+            .author = "The Linux Foundation",
+            .methods = &qcom_ap_module_methods,
+            .dso = NULL,
+            .reserved = {0},
         },
     },
 };
