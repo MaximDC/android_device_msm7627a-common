@@ -44,8 +44,8 @@ for patch in `find -type f -name '*.patch'|cut -d / -f 2-|sort`; do
 				rm /tmp/patch /tmp/commit
 				echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 				echo ' Resetting branch!'
-				git checkout $commit_hash~1
-				git am $absolute_patch_path || git am --abort
+#				git checkout $commit_hash~1
+#				git am $absolute_patch_path || git am --abort
 			fi
 		else
 			echo "Unable to get commit hash for '$title'! Something went wrong!"
