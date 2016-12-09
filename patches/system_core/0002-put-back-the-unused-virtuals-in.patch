@@ -1,7 +1,7 @@
 From d4de3e59e5ce35ed07291c21ed9532285cd2e112 Mon Sep 17 00:00:00 2001
 From: grace5921 <androidlover5842@gmail.com>
 Date: Thu, 8 Dec 2016 22:27:46 +0530
-Subject: [PATCH] put back the unused virtuals in  Vector merged all patchs
+Subject: [PATCH] merged all Vector patchs
 
 Change-Id: I7f370b36ca5b3b85e042bf0053d3f9fd734ab7e2
 ---
