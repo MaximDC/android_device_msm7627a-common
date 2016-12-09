@@ -42,7 +42,7 @@ char const*const LCD_FILE
         = "/sys/class/leds/lcd-backlight/brightness";
 
 char const*const BUTTON_FILE
-        = "/sys/class/sec/sec_touchkey/brightnes";
+        = "/sys/class/sec/sec_touchkey/brightness";
 
 #ifdef GENERIC_BLN
 char const*const NOTIFICATION_FILE
