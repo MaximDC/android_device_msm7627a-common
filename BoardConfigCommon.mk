@@ -67,6 +67,12 @@ BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000
 BOARD_KERNEL_PAGESIZE := 4096
 TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.7
 TARGET_KERNEL_SOURCE := kernel/samsung/msm7627a-common
+ifneq ($(filter arubaslim,$(TARGET_DEVICE)),)
+TARGET_KERNEL_CONFIG := arubaslim_defconfig
+else
+TARGET_KERNEL_CONFIG := delos_defconfig
+endif
+
 # Hardware rendering
 BOARD_EGL_WORKAROUND_BUG_10194508 := true
 #BOARD_USE_MHEAP_SCREENSHOT := true
