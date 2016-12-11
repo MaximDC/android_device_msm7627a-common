@@ -1,0 +1,49 @@
+From 9fc422c67d9468de83a04e0ae04fc84f2f2d2eb4 Mon Sep 17 00:00:00 2001
+From: DigiGoon <kagatharatarang@gmail.com>
+Date: Sun, 11 Dec 2016 19:07:19 +0530
+Subject: [PATCH] build: fix compilation error
+
+Change-Id: I3428bb59256d583fc0d5d84bd306cb7f5b508e44
+---
+ core/tasks/kernel.mk | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
+
+diff --git a/core/tasks/kernel.mk b/core/tasks/kernel.mk
+index 73118c8..eee96ce 100644
+--- a/core/tasks/kernel.mk
++++ b/core/tasks/kernel.mk
+@@ -231,24 +231,12 @@ endif
+ endif
+ 
+ ifneq ($(USE_CCACHE),)
+-    # Check if there is a ccache binary provided by the system
+-    # If there is, use it instead of prebuilt binary
+-    ccache_version := $(shell ccache --version 2>/dev/null)
+-    ifdef ccache_version
+-        ccache := $(shell which ccache)
+-    else
+-        ccache := $(ANDROID_BUILD_TOP)/prebuilts/misc/$(HOST_PREBUILT_TAG)/ccache/ccache
+-    endif
+-
++    ccache := $(ANDROID_BUILD_TOP)/prebuilts/misc/$(HOST_PREBUILT_TAG)/ccache/ccache
+     # Check that the executable is here.
+     ccache := $(strip $(wildcard $(ccache)))
+ endif
+ 
+-ifneq ($(TARGET_KERNEL_CUSTOM_TOOLCHAIN),)
+-    KERNEL_CROSS_COMPILE := CROSS_COMPILE="$(ccache) $(ANDROID_BUILD_TOP)/prebuilts/gcc/toolchain/$(TARGET_KERNEL_CUSTOM_TOOLCHAIN)/bin/$(KERNEL_TOOLCHAIN_PREFIX)"
+-else
+-    KERNEL_CROSS_COMPILE := CROSS_COMPILE="$(ccache) $(KERNEL_TOOLCHAIN_PATH)"
+-endif
++KERNEL_CROSS_COMPILE := CROSS_COMPILE="$(ccache) $(KERNEL_TOOLCHAIN_PATH)"
+ ccache =
+ 
+ define mv-modules
+@@ -383,3 +371,4 @@ endif
+ 
+ .PHONY: kernel
+ kernel: $(INSTALLED_KERNEL_TARGET)
++
+-- 
+2.1.4
+
