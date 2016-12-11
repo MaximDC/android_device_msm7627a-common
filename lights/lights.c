@@ -313,9 +313,7 @@ set_light_backlight(struct light_device_t *dev,
     return err;
 }
 
-static int
-set_light_buttons(struct light_state_t const* state)
-{
+static int set_light_buttons (struct light_device_t* dev, struct light_state_t const* state) {
      int err = 0;
      int on = is_lit (state);
      ALOGV("%s state->color = %d is_lit = %d", __func__,state->color , on);
@@ -326,8 +324,7 @@ set_light_buttons(struct light_state_t const* state)
          write_int(BUTTON_FILE, 0);
 
      pthread_mutex_unlock (&g_lock);
-
-    return err;
+     return err;
 }
 
 /** Close the lights device */
