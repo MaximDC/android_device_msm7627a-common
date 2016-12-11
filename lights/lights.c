@@ -17,6 +17,7 @@
 
 
 // #define LOG_NDEBUG 0
+#define LOG_TAG "lights.msm7627a"
 
 #include <cutils/log.h>
 
@@ -313,18 +314,19 @@ set_light_backlight(struct light_device_t *dev,
 }
 
 static int
-set_light_buttons(struct light_device_t *dev,
-        struct light_state_t const* state)
+set_light_buttons(struct light_state_t const* state)
 {
-    int err = 0;
+     int err = 0;
+     int on = is_lit (state);
+     ALOGV("%s state->color = %d is_lit = %d", __func__,state->color , on);
+     pthread_mutex_lock (&g_lock);
+     if(on)
+         write_int(BUTTON_FILE, 1);
+     else
+         write_int(BUTTON_FILE, 0);
 
-    if(!dev) {
-        return -1;
-    }
+     pthread_mutex_unlock (&g_lock);
 
-    pthread_mutex_lock(&g_lock);
-    err = write_int(BUTTON_FILE, state->color & 0xFF);
-    pthread_mutex_unlock(&g_lock);
     return err;
 }
 
