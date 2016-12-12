@@ -23,6 +23,7 @@ Device tree for Galaxy Win GT-I8552 (2 SIM)
 <manifest>
 <project path="device/samsung/msm7627a-common" name="I8552-CM/android_device_msm7627a-common" revision="cm-13.0" />
 <project path="device/samsung/delos3geur" name="I8552-CM/device_samsung_delos3geur" revision="master" />
+<project path="vendor/samsung/msm7627a-common" name="I8552-CM/android_vendor_msm7627a-common" revision="cm-13.0" />
 <project path="device/samsung/arubaslim" name="I8552-CM/device_samsung_arubaslim" revision="master" />
 <project path="kernel/samsung/msm7627a-common" name="I8552-CM/android_kernel_arubaslim" revision="mm6.0" />
 <project path="hardware/qcom/display-caf/msm7x27a" name="I8552-CM/hardware_qcom_display-caf" revision="cm-14.0" />
