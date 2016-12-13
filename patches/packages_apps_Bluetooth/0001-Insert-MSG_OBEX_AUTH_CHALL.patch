@@ -1,0 +1,36 @@
+From 012f8efef5cdbfcea88bc17bffecf8a74789512b Mon Sep 17 00:00:00 2001
+From: daniel_hk <daniel.p6800@gmail.com>
+Date: Tue, 29 Sep 2015 18:48:22 +0800
+Subject: [PATCH] Insert MSG_OBEX_AUTH_CHALL
+
+Needed by Bluez
+---
+ src/com/android/bluetooth/map/BluetoothMapService.java | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/com/android/bluetooth/map/BluetoothMapService.java b/src/com/android/bluetooth/map/BluetoothMapService.java
+index 4109cb5..914296b 100755
+--- a/src/com/android/bluetooth/map/BluetoothMapService.java
++++ b/src/com/android/bluetooth/map/BluetoothMapService.java
+@@ -87,12 +87,14 @@ public class BluetoothMapService extends ProfileService {
+ 
+     public static final int MSG_SESSION_DISCONNECTED = 5002;
+ 
+-    public static final int MSG_MAS_CONNECT = 5003; // Send at MAS connect, including the MAS_ID
+-    public static final int MSG_MAS_CONNECT_CANCEL = 5004; // Send at auth. declined
++    public static final int MSG_OBEX_AUTH_CHALL = 5003;
+ 
+-    public static final int MSG_ACQUIRE_WAKE_LOCK = 5005;
++    public static final int MSG_MAS_CONNECT = 5004; // Send at MAS connect, including the MAS_ID
++    public static final int MSG_MAS_CONNECT_CANCEL = 5005; // Send at auth. declined
+ 
+-    public static final int MSG_RELEASE_WAKE_LOCK = 5006;
++    public static final int MSG_ACQUIRE_WAKE_LOCK = 5006;
++
++    public static final int MSG_RELEASE_WAKE_LOCK = 5007;
+ 
+     public static final int MSG_MNS_SDP_SEARCH = 5007;
+ 
+-- 
+2.10.1
+
