@@ -1,0 +1,26 @@
+From 3c1f3b9342f7120802163d9058a363a9376f36b4 Mon Sep 17 00:00:00 2001
+From: grace5921 <androidlover5842@gmail.com>
+Date: Tue, 13 Dec 2016 18:25:39 +0530
+Subject: [PATCH] add build support for msm7x27a
+
+Change-Id: I14ed54c990a0d0019c40561b71b9857b96394c11
+---
+ Android.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Android.mk b/Android.mk
+index 98f7bd1..484bcf8 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -11,7 +11,7 @@ endif
+ ifneq (,$(filter $(QCOM_BOARD_PLATFORMS),$(TARGET_BOARD_PLATFORM)))
+     include $(call all-named-subdir-makefiles,$(display-hals))
+ else
+-ifneq ($(filter msm8226 msm8x26 msm8960 msm8974 msm8x74,$(TARGET_BOARD_PLATFORM)),)
++ifneq ($(filter msm8226 msm7x27a msm8x26 msm8960 msm8974 msm8x74,$(TARGET_BOARD_PLATFORM)),)
+     #This is for mako since it doesn't have the QCOM make functions
+     include $(call all-named-subdir-makefiles,$(display-hals))
+ endif
+-- 
+2.10.1
+

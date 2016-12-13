@@ -1,0 +1,33 @@
+From 9d1beb19fce9e706ff7a90eafda8931cea1667a0 Mon Sep 17 00:00:00 2001
+From: grace5921 <androidlover5842@gmail.com>
+Date: Wed, 14 Dec 2016 03:17:54 +0530
+Subject: [PATCH] patch: Fixed misplaced return
+
+Change-Id: I31fdb45017f76302fda41aa96574240689f05e82
+---
+ include/hardware/audio.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/hardware/audio.h b/include/hardware/audio.h
+index 190a4d8..427b738 100644
+--- a/include/hardware/audio.h
++++ b/include/hardware/audio.h
+@@ -561,7 +561,6 @@ static inline size_t audio_stream_frame_size(const struct audio_stream *s)
+             chan_samp_sz = sizeof(int8_t);
+             break;
+         }
+-        return popcount(chan_mask) * chan_samp_sz;
+     }
+ #else
+     audio_format_t format = s->get_format(s);
+@@ -574,6 +573,7 @@ static inline size_t audio_stream_frame_size(const struct audio_stream *s)
+ 
+     return sizeof(int8_t);
+ #endif
++        return popcount(chan_mask) * chan_samp_sz;
+ }
+ 
+ 
+-- 
+2.10.1
+

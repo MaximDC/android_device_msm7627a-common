@@ -1,0 +1,191 @@
+# Copyright (C) 2013 The CyanogenMod Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# BoardConfig.mk
+#
+
+## Build
+BUILD_EMULATOR := false
+
+## bootloader etc.
+TARGET_NO_BOOTLOADER := true
+TARGET_NO_RADIOIMAGE := true
+QCOM_BOARD_PLATFORMS += msm7x27a
+
+ifneq ($(filter arubaslim,$(TARGET_DEVICE)),)
+TARGET_OTA_ASSERT_DEVICE := arubaslim,GT-I8262,I8262
+else
+TARGET_OTA_ASSERT_DEVICE := delos3geur,GT-I8552,I8552,msm7x27a
+endif
+
+## Platform
+TARGET_ARCH := arm
+TARGET_ARCH_VARIANT := armv7-a-neon
+TARGET_BOARD_PLATFORM := msm7x27a
+TARGET_BOARD_PLATFORM_GPU := qcom-adreno200
+TARGET_CPU_ABI := armeabi-v7a
+TARGET_CPU_ABI2 := armeabi
+TARGET_CPU_VARIANT := cortex-a5
+ARCH_ARM_HAVE_TLS_REGISTER := true
+TARGET_GLOBAL_CFLAGS += -mtune=cortex-a5 -mfpu=neon -mfloat-abi=softfp
+TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a5 -mfpu=neon -mfloat-abi=softfp
+
+## Qualcomm optimizations
+TARGET_CORTEX_CACHE_LINE_32 := true
+TARGET_USE_SPARROW_BIONIC_OPTIMIZATION := true
+TARGET_AVOID_DRAW_TEXTURE_EXTENSION := true
+TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
+TARGET_CPU_SMP := true
+TARGET_ARCH_LOWMEM := true
+ARCH_ARM_HIGH_OPTIMIZATION := true
+#TARGET_BOOTANIMATION_TEXTURE_CACHE := false
+
+## Memory
+TARGET_USES_ION := true
+
+## FM
+BOARD_HAVE_QCOM_FM := true
+COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED
+
+## Camera
+
+COMMON_GLOBAL_CFLAGS += -DBINDER_COMPAT
+COMMON_GLOBAL_CFLAGS += -DNEEDS_VECTORIMPL_SYMBOLS
+COMMON_GLOBAL_CFLAGS += -DSAMSUNG_CAMERA_LEGACY -DREFBASE_JB_MR1_COMPAT_SYMBOLS
+
+## Qualcomm hardware
+BOARD_USES_QCOM_HARDWARE := true
+COMMON_GLOBAL_CFLAGS += -DQCOM_HARDWARE
+TARGET_QCOM_DISPLAY_VARIANT := caf
+TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
+COMMON_GLOBAL_CFLAGS += -DQCOM_LEGACY_MMPARSE
+TARGET_USES_QCOM_BSP := true
+COMMON_GLOBAL_CFLAGS += -DQCOM_BSP
+
+## Kernel
+TARGET_KERNEL_SOURCE := kernel/samsung/msm7627a-common
+ifneq ($(filter arubaslim,$(TARGET_DEVICE)),)
+TARGET_KERNEL_CONFIG := arubaslim_defconfig
+else
+TARGET_KERNEL_CONFIG := delos_defconfig
+endif
+BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom
+BOARD_KERNEL_BASE := 0x00200000
+BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000
+BOARD_KERNEL_PAGESIZE := 4096
+
+# Media
+TARGET_QCOM_MEDIA_VARIANT := caf
+COMMON_GLOBAL_CFLAGS += -DLPA_DEFAULT_BUFFER_SIZE=480
+COMMON_GLOBAL_CFLAGS += -DQCOM_NO_SECURE_PLAYBACK
+
+## Audio
+TARGET_QCOM_AUDIO_VARIANT := caf
+#BOARD_QCOM_VOIP_ENABLED := true
+BOARD_USES_LEGACY_ALSA_AUDIO := true
+
+## EGL, graphics
+USE_OPENGL_RENDERER := true
+TARGET_DISPLAY_USE_RETIRE_FENCE := true
+BOARD_ADRENO_DECIDE_TEXTURE_TARGET := true
+COMMON_GLOBAL_CFLAGS += -DUSE_MDP3
+TARGET_GRALLOC_USES_ASHMEM := true
+HWUI_COMPILE_FOR_PERF := true
+
+## GPS
+BOARD_USES_QCOM_LIBRPC := true
+BOARD_USES_QCOM_GPS := true
+BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := msm7x27a
+BOARD_VENDOR_QCOM_GPS_LOC_API_AMSS_VERSION := 50000
+
+# Charger
+BOARD_CHARGER_RES := device/samsung/msm7627a-common/charger
+BOARD_BATTERY_DEVICE_NAME := "battery"
+BOARD_CHARGER_ENABLE_SUSPEND := true
+BOARD_LPM_BOOT_ARGUMENT_NAME := androidboot.bootchg
+BOARD_LPM_BOOT_ARGUMENT_VALUE := true
+
+## Bluetooth
+BOARD_HAVE_BLUETOOTH := true
+BOARD_HAVE_BLUETOOTH_CSR := true
+
+## Wi-Fi
+BOARD_WLAN_DEVICE := ath6kl
+WPA_SUPPLICANT_VERSION := VER_0_8_X
+BOARD_WPA_SUPPLICANT_DRIVER := NL80211
+BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_ath6kl
+BOARD_HOSTAPD_DRIVER := NL80211
+BOARD_HOSTAPD_PRIVATE_LIB := lib_driver_cmd_ath6kl
+WIFI_EXT_MODULE_NAME := "cfg80211"
+WIFI_EXT_MODULE_PATH := "/system/lib/modules/cfg80211.ko"
+WIFI_DRIVER_MODULE_AP_ARG := "suspend_mode=3 wow_mode=2 ath6kl_p2p=1 recovery_enable=1"
+WIFI_DRIVER_MODULE_NAME := "ath6kl_sdio"
+WIFI_DRIVER_MODULE_PATH := "/system/lib/modules/ath6kl_sdio.ko"
+WIFI_DRIVER_MODULE_ARG := "suspend_mode=3 wow_mode=2 ath6kl_p2p=1 recovery_enable=1"
+
+## RIL
+BOARD_USES_LEGACY_RIL := true
+BOARD_MOBILEDATA_INTERFACE_NAME := "pdp0"
+BOARD_RIL_CLASS := ../../../device/samsung/msm7627a-common/ril/
+COMMON_GLOBAL_CFLAGS += -DRIL_SUPPORTS_SEEK
+COMMON_GLOBAL_CFLAGS += -DRIL_VARIANT_LEGACY
+
+# CMHW
+BOARD_HARDWARE_CLASS := device/samsung/msm7627a-common/cmhw/
+
+## Vold
+BOARD_VOLD_EMMC_SHARES_DEV_MAJOR := true
+BOARD_VOLD_MAX_PARTITIONS := 24
+
+## UMS
+TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/file
+BOARD_UMS_LUNFILE := "/sys/devices/platform/msm_hsusb/gadget/lun%d/file"
+
+## Samsung has weird framebuffer
+TARGET_NO_INITLOGO := true
+
+## Override healthd HAL
+#BOARD_HAL_STATIC_LIBRARIES := libhealthd.msm7x27a
+
+## Recovery
+TARGET_RECOVERY_FSTAB := device/samsung/msm7627a-common/ramdisk/fstab.qcom
+TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
+RECOVERY_FSTAB_VERSION := 2
+
+## Filesystem
+BOARD_DATA_DEVICE := /dev/block/mmcblk0p24
+BOARD_DATA_FILESYSTEM := ext4
+BOARD_DATA_FILESYSTEM_OPTIONS := rw
+BOARD_SYSTEM_DEVICE := /dev/block/mmcblk0p21
+BOARD_SYSTEM_FILESYSTEM := ext4
+BOARD_SYSTEM_FILESYSTEM_OPTIONS := rw
+BOARD_CACHE_DEVICE := /dev/block/mmcblk0p22
+BOARD_CACHE_FILESYSTEM := ext4
+BOARD_CACHE_FILESYSTEM_OPTIONS := rw
+WITH_DEXPREOPT := true
+
+## Partition sizes
+BOARD_BOOTIMAGE_PARTITION_SIZE := 13471744
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 13471744
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1258291200
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 5573804032
+
+## Other Features
+TARGET_USERIMAGES_USE_EXT4 := true
+TARGET_USERIMAGES_USE_F2FS := true
+BOARD_HAS_SDCARD_INTERNAL := true
+BOARD_HAS_DOWNLOAD_MODE := true
+BOARD_USES_MMCUTILS := true
+BOARD_HAS_NO_MISC_PARTITION := true
+BOARD_FLASH_BLOCK_SIZE := 131072
