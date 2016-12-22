@@ -95,8 +95,6 @@ PRODUCT_PACKAGES += libdbus
 PRODUCT_PACKAGES += audio.sco.default 
 PRODUCT_PACKAGES += bluetoothd
 
-PRODUCT_PACKAGES += power.msm7x27a
-PRODUCT_PACKAGES += power.qcom
 PRODUCT_PACKAGES += charger_res_images 
 
 PRODUCT_PACKAGES += com.android.future.usb.accessory
