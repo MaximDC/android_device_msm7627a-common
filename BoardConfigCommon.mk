@@ -30,8 +30,8 @@ USE_CAMERA_STUB := false
 DISABLE_DEXPREOPT := true
 
 # Compiler flags
-TARGET_GLOBAL_CFLAGS += -mtune=cortex-a5 -mfpu=neon-vfpv4 -mfloat-abi=softfp
-TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a5 -mfpu=neon-vfpv4 -mfloat-abi=softfp
+TARGET_GLOBAL_CFLAGS += -mtune=cortex-a9 -mfpu=neon-vfpv4 -mfloat-abi=softfp
+TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a9 -mfpu=neon-vfpv4 -mfloat-abi=softfp
 
 # Qualcomm hardware
 BOARD_USES_QCOM_HARDWARE := true
@@ -53,7 +53,7 @@ TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a-neon
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
-TARGET_CPU_VARIANT := cortex-a5
+TARGET_CPU_VARIANT := cortex-a9
 TARGET_BOARD_PLATFORM := msm7x27a
 TARGET_CPU_SMP := true
 
