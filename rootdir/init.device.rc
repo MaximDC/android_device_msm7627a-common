@@ -100,6 +100,11 @@ on property:persist.sys.thermal.monitor=0
 #    group system
 #    disabled
 
+service thermald /system/bin/thermald
+    class main
+    user root
+    group root
+
 service mpdecision /system/bin/mpdecision --no_sleep --avg_comp
     class late_start
     disabled
