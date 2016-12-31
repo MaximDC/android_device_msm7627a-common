@@ -20,5 +20,6 @@ def mangle_default_prop_hook(prop):
   prop.put("ro.debuggable", "1")
   prop.put("persist.service.adb.enable", "1")
   prop.put("persist.sys.usb.config", "mtp,adb")
+  prop.put("ro.opengles.version", "196608")
   
   pass
