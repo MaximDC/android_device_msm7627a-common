@@ -208,6 +208,12 @@ PRODUCT_PROPERTY_OVERRIDES += \
     wifi.interface=wlan0 \
     wifi.supplicant_scan_interval=60
 
+# Insecure ADBD
+# (ro.adb.secure=3)
+ADDITIONAL_DEFAULT_PROPERTIES += \
+	ro.adb.secure=0 \
+	persist.service.adb.enable=1
+
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.adb.secure=0
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += ro.secure=0
 
