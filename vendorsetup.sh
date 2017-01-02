@@ -10,7 +10,6 @@ make -j4 bacon
 function delos3geur_select
 {
 lunch cm_delos3geur-userdebug
-make -j4 bacon
 }
 function arubaslim
 {
@@ -20,5 +19,4 @@ make -j4 bacon
 function arubaslim_select
 {
 lunch cm_arubaslim-userdebug
-make -j4 bacon
 }
