@@ -2008,7 +2008,7 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input, uint32_t outputDe
     // if inputDevice == 0, restore output routing
     if (new_snd_device == -1) {
         if (outputDevices & (outputDevices - 1)) {
-            if ((outputDevices & AUDIO_DEVICE_OUT_SPEAKER) == 0) {
+            if ((outputDevices & AudioSystem::DEVICE_OUT_SPEAKER) == 0) {
                 ALOGV("Hardware does not support requested route combination (%#X),"
                      " picking closest possible route...", outputDevices);
             }
@@ -2028,14 +2028,14 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input, uint32_t outputDe
             }
 #ifdef COMBO_DEVICE_SUPPORTED
         } else if ((outputDevices & AUDIO_DEVICE_OUT_WIRED_HEADSET) &&
-                   (outputDevices & AUDIO_DEVICE_OUT_SPEAKER)) {
+                   (outputDevices & AudioSystem::DEVICE_OUT_SPEAKER)) {
             ALOGI("Routing audio to Wired Headset and Speaker\n");
             new_snd_device = SND_DEVICE_STEREO_HEADSET_AND_SPEAKER;
             new_post_proc_feature_mask = (ADRC_ENABLE | EQ_ENABLE | RX_IIR_ENABLE | MBADRC_ENABLE);
             rx_device = CAD_HW_DEVICE_ID_HEADSET_AND_SPEAKER_RX;
             tx_device = CAD_HW_DEVICE_ID_MP3_HEADSET_TX;
         } else if ((outputDevices & AUDIO_DEVICE_OUT_WIRED_HEADPHONE) &&
-                   (outputDevices & AUDIO_DEVICE_OUT_SPEAKER)) {
+                   (outputDevices & AudioSystem::DEVICE_OUT_SPEAKER)) {
             ALOGI("Routing audio to No microphone Wired Headset and Speaker (%d,%x)\n", mMode, outputDevices);
             new_snd_device = SND_DEVICE_STEREO_HEADSET_AND_SPEAKER;
             new_post_proc_feature_mask = (ADRC_ENABLE | EQ_ENABLE | RX_IIR_ENABLE | MBADRC_ENABLE);
@@ -2057,7 +2057,7 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input, uint32_t outputDe
                 new_snd_device = SND_DEVICE_FM_ANALOG_STEREO_HEADSET_CODEC;
                 enableDgtlFmDriver = false;
             }
-        } else if ((outputDevices & AUDIO_DEVICE_OUT_SPEAKER) &&
+        } else if ((outputDevices & AudioSystem::DEVICE_OUT_SPEAKER) &&
                    (outputDevices & AUDIO_DEVICE_OUT_FM)) {
             ALOGI("Routing FM to Speakerphone\n");
             new_snd_device = SND_DEVICE_FM_DIGITAL_SPEAKER_PHONE;
@@ -2091,7 +2091,7 @@ status_t AudioHardware::doRouting(AudioStreamInMSM72xx *input, uint32_t outputDe
             new_post_proc_feature_mask = (ADRC_ENABLE | EQ_ENABLE | RX_IIR_ENABLE | MBADRC_ENABLE);
             rx_device = CAD_HW_DEVICE_ID_MP3_HEADSET_RX;
             tx_device = CAD_HW_DEVICE_ID_MP3_HEADSET_TX;
-        } else if (outputDevices & AUDIO_DEVICE_OUT_SPEAKER) {
+        } else if (outputDevices & AudioSystem::DEVICE_OUT_SPEAKER) {
             ALOGI("Routing audio to Speakerphone\n");
             new_snd_device = SND_DEVICE_SPEAKER;
             new_post_proc_feature_mask = (ADRC_ENABLE | EQ_ENABLE | RX_IIR_ENABLE | MBADRC_ENABLE);
