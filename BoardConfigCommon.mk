@@ -69,6 +69,7 @@ ARCH_ARM_HAVE_32_BYTE_CACHE_LINES := true
 BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom hack_lcd=1 chg_hack_lcd=0
 BOARD_KERNEL_BASE := 0x00200000
 BOARD_KERNEL_PAGESIZE := 4096
+BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000 
 TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.7
 TARGET_KERNEL_SOURCE := kernel/samsung/msm7627a-common
 ifneq ($(filter arubaslim,$(TARGET_DEVICE)),)
