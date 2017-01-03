@@ -78,11 +78,11 @@ TARGET_KERNEL_CONFIG := delos_defconfig
 endif
 
 # Use custom boot.mk until weritos releases his kernel source
-ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
-BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000 --cmdline "androidboot.hardware=qcom hack_lcd=1 chg_hack_lcd=0" --base 0x00200000 --pagesize 4096
-PREBUILTED_KERNEL_PATH := device/samsung/kernel/kernel
-BOARD_CUSTOM_BOOTIMG_MK :=  device/samsung/msm7627a-common/bootimg.mk
-endif
+#ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
+#BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000 --cmdline "androidboot.hardware=qcom hack_lcd=1 chg_hack_lcd=0" --base 0x00200000 --pagesize 4096
+#PREBUILTED_KERNEL_PATH := device/samsung/kernel/kernel
+#BOARD_CUSTOM_BOOTIMG_MK :=  device/samsung/msm7627a-common/bootimg.mk
+#endif
 # Hardware rendering
 BOARD_EGL_WORKAROUND_BUG_10194508 := true
 #BOARD_USE_MHEAP_SCREENSHOT := true
