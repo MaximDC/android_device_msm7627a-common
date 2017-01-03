@@ -74,8 +74,10 @@ TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.7
 TARGET_KERNEL_SOURCE := kernel/samsung/msm7627a-common
 ifneq ($(filter arubaslim,$(TARGET_DEVICE)),)
 TARGET_KERNEL_CONFIG := arubaslim_defconfig
+PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8262.rle:root/initlogo.rle
 else
 TARGET_KERNEL_CONFIG := delos_defconfig
+PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
 endif
 
 # Use custom boot.mk until weritos releases his kernel source

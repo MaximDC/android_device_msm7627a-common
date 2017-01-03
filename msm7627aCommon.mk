@@ -39,11 +39,7 @@ PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/init.qcom.ril.sh:ro
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/ueventd.qcom.rc:root/ueventd.qcom.rc
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/charger:root/charger
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/init.qcom.usb.rc:root/init.qcom.usb.rc
-ifneq ($(filter delos3geur ,$(TARGET_DEVICE)),)
-PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
-else
-PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8262.rle:root/initlogo.rle
-endif
+
 #errors
 PRODUCT_COPY_FILES += vendor/samsung/msm7627a-common/proprietary/lib/libaudioalsa.so:obj/lib/libaudioalsa.so
 PRODUCT_COPY_FILES += vendor/samsung/msm7627a-common/proprietary/lib/libaudcal.so:obj/lib/libaudcal.so
