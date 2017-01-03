@@ -30,6 +30,15 @@ on init
     # framebuffer pls... :(
     # write /sys/module/msm_fb/parameters/align_buffer 1
 
+on post-fs
+    exec /system/bin/sh /system/etc/init.qcom.thermald_conf.sh
+
+service thermald /system/bin/thermald
+   class late_start
+   user root
+   group root
+   disabled
+
 on boot
    start qcamerasvr
    #start gpu_dcvsd
@@ -89,31 +98,15 @@ service gps_check /system/bin/gps_check
     group root
     oneshot
 
-on property:persist.sys.thermal.monitor=1
-    start thermald
-
-on property:persist.sys.thermal.monitor=0
-    stop thermald
-
 #service qosmgrd /system/bin/qosmgr /system/etc/qosmgr_rules.xml
 #    user system
 #    group system
 #    disabled
 
-service thermald /system/bin/thermald
-    class main
-    user root
-    group root
-
 service mpdecision /system/bin/mpdecision --no_sleep --avg_comp
     class late_start
     disabled
     user root
-
-service thermald /system/bin/thermald
-    class late_start
-    user root
-    group root
 
 service gpu_dcvsd /system/bin/gpu_dcvsd
     class late_start
