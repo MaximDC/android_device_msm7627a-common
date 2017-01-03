@@ -1,0 +1,425 @@
+From bf094aeb23635159df0cc3e33e611e6049a198b6 Mon Sep 17 00:00:00 2001
+From: Dan Willemsen <dwillemsen@google.com>
+Date: Thu, 29 Sep 2016 20:09:47 -0700
+Subject: [PATCH] Support marking variables as readonly
+
+When the magic variable .KATI_READONLY is set to a variable name, any
+further attempts to modify the named variable will result in an error.
+
+  FOO := bar
+  .KATI_READONLY := FOO
+  FOO := baz  # Error!
+
+This is useful to make some global configuration readonly so that
+another makefile cannot change it. In Android, we emulated this by
+backing up some global configuration before including the Android.mk
+files, then comparing the current values to the backed up values after
+they've been included. But this means we don't know the location that
+modified the variable, just that something did. And it's not perfect,
+since the backup can also be changed.
+
+Something similar to this could be implemented with `override`, but then
+setting the variable silently fails, and it still could be overriden
+with another override.
+---
+ eval.cc                             | 53 +++++++++++++++++++++++++++++++++----
+ eval.h                              |  2 ++
+ symtab.cc                           | 11 +++++++-
+ symtab.h                            |  2 +-
+ testcase/readonly_global.sh         | 47 ++++++++++++++++++++++++++++++++
+ testcase/readonly_global_missing.sh | 32 ++++++++++++++++++++++
+ testcase/readonly_rule.sh           | 48 +++++++++++++++++++++++++++++++++
+ testcase/readonly_rule_missing.sh   | 32 ++++++++++++++++++++++
+ var.cc                              |  9 +++++--
+ var.h                               |  8 +++++-
+ 10 files changed, 234 insertions(+), 10 deletions(-)
+ create mode 100644 testcase/readonly_global.sh
+ create mode 100644 testcase/readonly_global_missing.sh
+ create mode 100644 testcase/readonly_rule.sh
+ create mode 100644 testcase/readonly_rule_missing.sh
+
+diff --git a/eval.cc b/eval.cc
+index da183f7..115d3dd 100644
+--- a/eval.cc
++++ b/eval.cc
+@@ -36,7 +36,8 @@ Evaluator::Evaluator()
+       avoid_io_(false),
+       eval_depth_(0),
+       posix_sym_(Intern(".POSIX")),
+-      is_posix_(false) {
++      is_posix_(false),
++      kati_readonly_(Intern(".KATI_READONLY")) {
+ }
+ 
+ Evaluator::~Evaluator() {
+@@ -69,6 +70,8 @@ Var* Evaluator::EvalRHS(Symbol lhs, Value* rhs_v, StringPiece orig_rhs,
+       Var* prev = LookupVarInCurrentScope(lhs);
+       if (!prev->IsDefined()) {
+         rhs = new RecursiveVar(rhs_v, origin, orig_rhs);
++      } else if (prev->ReadOnly()) {
++        Error(StringPrintf("*** cannot assign to readonly variable: %s", lhs.c_str()));
+       } else {
+         prev->AppendVar(this, rhs_v);
+         rhs = prev;
+@@ -101,11 +104,31 @@ void Evaluator::EvalAssign(const AssignStmt* stmt) {
+   Symbol lhs = stmt->GetLhsSymbol(this);
+   if (lhs.empty())
+     Error("*** empty variable name.");
++
++  if (lhs == kati_readonly_) {
++    string rhs;
++    stmt->rhs->Eval(this, &rhs);
++    for (auto const& name : WordScanner(rhs)) {
++      Var* var = Intern(name).GetGlobalVar();
++      if (!var->IsDefined()) {
++        Error(StringPrintf("*** unknown variable: %s", name.as_string().c_str()));
++      }
++      var->SetReadOnly();
++    }
++    return;
++  }
++
+   Var* rhs = EvalRHS(lhs, stmt->rhs, stmt->orig_rhs, stmt->op,
+                      stmt->directive == AssignDirective::OVERRIDE);
+-  if (rhs)
++  if (rhs) {
++    bool readonly;
+     lhs.SetGlobalVar(rhs,
+-                     stmt->directive == AssignDirective::OVERRIDE);
++                     stmt->directive == AssignDirective::OVERRIDE,
++                     &readonly);
++    if (readonly) {
++      Error(StringPrintf("*** cannot assign to readonly variable: %s", lhs.c_str()));
++    }
++  }
+ }
+ 
+ void Evaluator::EvalRule(const RuleStmt* stmt) {
+@@ -167,9 +190,29 @@ void Evaluator::EvalRule(const RuleStmt* stmt) {
+     }
+ 
+     current_scope_ = p.first->second;
++
++    if (lhs == kati_readonly_) {
++      string rhs_value;
++      rhs->Eval(this, &rhs_value);
++      for (auto const& name : WordScanner(rhs_value)) {
++        Var* var = current_scope_->Lookup(Intern(name));
++        if (!var->IsDefined()) {
++          Error(StringPrintf("*** unknown variable: %s", name.as_string().c_str()));
++        }
++        var->SetReadOnly();
++      }
++      current_scope_ = NULL;
++      continue;
++    }
++
+     Var* rhs_var = EvalRHS(lhs, rhs, StringPiece("*TODO*"), rule_var.op);
+-    if (rhs_var)
+-      current_scope_->Assign(lhs, new RuleVar(rhs_var, rule_var.op));
++    if (rhs_var) {
++      bool readonly;
++      current_scope_->Assign(lhs, new RuleVar(rhs_var, rule_var.op), &readonly);
++      if (readonly) {
++        Error(StringPrintf("*** cannot assign to readonly variable: %s", lhs.c_str()));
++      }
++    }
+     current_scope_ = NULL;
+   }
+ }
+diff --git a/eval.h b/eval.h
+index bf8c98a..c0f27b9 100644
+--- a/eval.h
++++ b/eval.h
+@@ -125,6 +125,8 @@ class Evaluator {
+   bool is_posix_;
+ 
+   static unordered_set<Symbol> used_undefined_vars_;
++
++  Symbol kati_readonly_;
+ };
+ 
+ #endif  // EVAL_H_
+diff --git a/symtab.cc b/symtab.cc
+index cbaa4b4..0e51c21 100644
+--- a/symtab.cc
++++ b/symtab.cc
+@@ -59,11 +59,20 @@ Var* Symbol::GetGlobalVar() const {
+   return v;
+ }
+ 
+-void Symbol::SetGlobalVar(Var* v, bool is_override) const {
++void Symbol::SetGlobalVar(Var* v, bool is_override, bool* readonly) const {
+   if (static_cast<size_t>(v_) >= g_symbol_data.size()) {
+     g_symbol_data.resize(v_ + 1);
+   }
+   Var* orig = g_symbol_data[v_].gv;
++  if (orig->ReadOnly()) {
++    if (readonly != nullptr)
++      *readonly = true;
++    else
++      ERROR("*** cannot assign to readonly variable: %s", c_str());
++    return;
++  } else if (readonly != nullptr) {
++    *readonly = false;
++  }
+   if (!is_override &&
+       (orig->Origin() == VarOrigin::OVERRIDE ||
+        orig->Origin() == VarOrigin::ENVIRONMENT_OVERRIDE)) {
+diff --git a/symtab.h b/symtab.h
+index e7e71d5..7e39be9 100644
+--- a/symtab.h
++++ b/symtab.h
+@@ -56,7 +56,7 @@ class Symbol {
+   bool IsValid() const { return v_ >= 0; }
+ 
+   Var* GetGlobalVar() const;
+-  void SetGlobalVar(Var* v, bool is_override = false) const;
++  void SetGlobalVar(Var* v, bool is_override = false, bool* readonly = nullptr) const;
+ 
+  private:
+   explicit Symbol(int v);
+diff --git a/testcase/readonly_global.sh b/testcase/readonly_global.sh
+new file mode 100644
+index 0000000..33695f2
+--- /dev/null
++++ b/testcase/readonly_global.sh
+@@ -0,0 +1,47 @@
++#!/bin/bash
++#
++# Copyright 2016 Google Inc. All rights reserved
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#      http:#www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++set -u
++
++mk="$@"
++
++function build() {
++  cat <<EOF > Makefile
++FOO $1 bar
++.KATI_READONLY $2 FOO
++FOO $3 baz
++all:
++EOF
++
++  echo "Testcase: $1 $2 $3"
++  if echo "${mk}" | grep -q "^make"; then
++    # Make doesn't support .KATI_READONLY
++    echo "Makefile:3: *** cannot assign to readonly variable: FOO"
++  else
++    ${mk} 2>&1 && echo "Clean exit"
++  fi
++}
++
++build "=" "=" "="
++build "=" "+=" "="
++build "=" ":=" "="
++
++build "=" ":=" ":="
++build "=" ":=" "+="
++
++build ":=" ":=" ":="
++build ":=" ":=" "+="
++build ":=" ":=" "="
+diff --git a/testcase/readonly_global_missing.sh b/testcase/readonly_global_missing.sh
+new file mode 100644
+index 0000000..cab86f2
+--- /dev/null
++++ b/testcase/readonly_global_missing.sh
+@@ -0,0 +1,32 @@
++#!/bin/bash
++#
++# Copyright 2016 Google Inc. All rights reserved
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#      http:#www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++set -u
++
++mk="$@"
++
++cat <<EOF > Makefile
++all: FOO = bar
++.KATI_READONLY = FOO
++all:
++EOF
++
++if echo "${mk}" | grep -q "^make"; then
++  # Make doesn't support .KATI_READONLY
++  echo "Makefile:2: *** unknown variable: FOO"
++else
++  ${mk} 2>&1 && echo "Clean exit"
++fi
+diff --git a/testcase/readonly_rule.sh b/testcase/readonly_rule.sh
+new file mode 100644
+index 0000000..676d639
+--- /dev/null
++++ b/testcase/readonly_rule.sh
+@@ -0,0 +1,48 @@
++#!/bin/bash
++#
++# Copyright 2016 Google Inc. All rights reserved
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#      http:#www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++set -u
++
++mk="$@"
++
++function build() {
++  cat <<EOF > Makefile
++all: FOO $1 bar
++all: .KATI_READONLY $2 FOO
++FOO $3 foo
++all: FOO $3 baz
++all:
++EOF
++
++  echo "Testcase: $1 $2 $3"
++  if echo "${mk}" | grep -q "^make"; then
++    # Make doesn't support .KATI_READONLY
++    echo "Makefile:4: *** cannot assign to readonly variable: FOO"
++  else
++    ${mk} 2>&1 && echo "Clean exit"
++  fi
++}
++
++#build "=" "=" "="
++#build "=" "+=" "="
++#build "=" ":=" "="
++#
++#build "=" ":=" ":="
++#build "=" ":=" "+="
++#
++#build ":=" ":=" ":="
++build ":=" ":=" "+="
++#build ":=" ":=" "="
+diff --git a/testcase/readonly_rule_missing.sh b/testcase/readonly_rule_missing.sh
+new file mode 100644
+index 0000000..6940438
+--- /dev/null
++++ b/testcase/readonly_rule_missing.sh
+@@ -0,0 +1,32 @@
++#!/bin/bash
++#
++# Copyright 2016 Google Inc. All rights reserved
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#      http:#www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++set -u
++
++mk="$@"
++
++cat <<EOF > Makefile
++FOO = bar
++all: .KATI_READONLY = FOO
++all:
++EOF
++
++if echo "${mk}" | grep -q "^make"; then
++  # Make doesn't support .KATI_READONLY
++  echo "Makefile:2: *** unknown variable: FOO"
++else
++  ${mk} 2>&1 && echo "Clean exit"
++fi
+diff --git a/var.cc b/var.cc
+index 4b67c4f..8f46ff8 100644
+--- a/var.cc
++++ b/var.cc
+@@ -37,7 +37,7 @@ const char* GetOriginStr(VarOrigin origin) {
+   return "*** broken origin ***";
+ }
+ 
+-Var::Var() {
++Var::Var() : readonly_(false) {
+ }
+ 
+ Var::~Var() {
+@@ -130,10 +130,15 @@ Var* Vars::Lookup(Symbol name) const {
+   return v;
+ }
+ 
+-void Vars::Assign(Symbol name, Var* v) {
++void Vars::Assign(Symbol name, Var* v, bool* readonly) {
++  *readonly = false;
+   auto p = emplace(name, v);
+   if (!p.second) {
+     Var* orig = p.first->second;
++    if (orig->ReadOnly()) {
++      *readonly = true;
++      return;
++    }
+     if (orig->Origin() == VarOrigin::OVERRIDE ||
+         orig->Origin() == VarOrigin::ENVIRONMENT_OVERRIDE) {
+       return;
+diff --git a/var.h b/var.h
+index 5fc09fa..75653de 100644
+--- a/var.h
++++ b/var.h
+@@ -56,8 +56,14 @@ class Var : public Evaluable {
+ 
+   virtual string DebugString() const = 0;
+ 
++  bool ReadOnly() const { return readonly_; }
++  void SetReadOnly() { readonly_ = true; }
++
+  protected:
+   Var();
++
++ private:
++  bool readonly_;
+ };
+ 
+ class SimpleVar : public Var {
+@@ -177,7 +183,7 @@ class Vars : public unordered_map<Symbol, Var*> {
+ 
+   Var* Lookup(Symbol name) const;
+ 
+-  void Assign(Symbol name, Var* v);
++  void Assign(Symbol name, Var* v, bool* readonly);
+ 
+   static void add_used_env_vars(Symbol v);
+ 
+-- 
+2.11.0
+
