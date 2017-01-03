@@ -39,7 +39,7 @@ PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/init.qcom.ril.sh:ro
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/ueventd.qcom.rc:root/ueventd.qcom.rc
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/charger:root/charger
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/init.qcom.usb.rc:root/init.qcom.usb.rc
-ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
+ifneq ($(filter delos3geur ,$(TARGET_DEVICE)),)
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
 else
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8262.rle:root/initlogo.rle
