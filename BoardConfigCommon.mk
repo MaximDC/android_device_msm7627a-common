@@ -1,5 +1,5 @@
 #
-# Copyright 2014 The Android Open Source Project
+# Copyright 2017 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -78,6 +78,11 @@ else
 TARGET_KERNEL_CONFIG := delos_defconfig
 endif
 
+# Use custom boot.mk until weritos releases his kernel source
+ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
+TARGET_KERNEL := device/samsung/kernel/kernel
+BOARD_CUSTOM_BOOTIMG_MK :=  device/samsung/msm7627a-common/bootimg.mk
+endif
 # Hardware rendering
 BOARD_EGL_WORKAROUND_BUG_10194508 := true
 #BOARD_USE_MHEAP_SCREENSHOT := true
