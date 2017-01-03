@@ -337,9 +337,6 @@ service sensord /system/bin/sensord
 
     # TelephonyManager.java requires this
     chmod 0644 /proc/cmdline
-
-    write /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate 25000
-    write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold 80
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 320000
 
     write /sys/devices/platform/msm_sdcc.1/idle_timeout 10
@@ -449,9 +446,9 @@ service qcamerasvr /system/bin/mm-qcamera-daemon
     group camera system inet input
 
 service qosmgrd /system/bin/qosmgr /system/etc/qosmgr_rules.xml
-    class late_start
     user system
     group system
+    disabled
 
 service charger /charger
     class charger
