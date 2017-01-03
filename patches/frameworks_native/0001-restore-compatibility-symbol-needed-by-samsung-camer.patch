@@ -1,14 +1,9 @@
-From 22d09deaff228c9af0bc14f6a5e3f19a5c465564 Mon Sep 17 00:00:00 2001
+From 3b354f33c596b3154199fd121884fc9e0fb8f1e6 Mon Sep 17 00:00:00 2001
 From: grace5921 <androidlover5842@gmail.com>
-Date: Mon, 2 Jan 2017 00:29:28 +0530
-Subject: [PATCH] Second try at adding a compatibility symbol for the
- MemoryBase constructor. Third-party libraries are currently trying to use the
- MemoryBase constructor but failing because we fixed the definition of
- ssize_t. This is a stop-gap for users of this private API until we can get
- them fixed.
+Date: Tue, 3 Jan 2017 19:51:18 +0530
+Subject: [PATCH] restore compatibility symbol needed by samsung camera
 
-Bug: 8253769
-Change-Id: Ie7c86f45fa39cb53539cab0ffe8585a585656714
+Change-Id: If9a53a6ba801db1897f6ac00b03a1f8d8e562ef6
 ---
  libs/binder/MemoryBase.cpp | 10 ++++++++++
  1 file changed, 10 insertions(+)
