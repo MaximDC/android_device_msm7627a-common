@@ -140,6 +140,9 @@ TARGET_QCOM_AUDIO_VARIANT := caf
 BOARD_USES_LEGACY_ALSA_AUDIO := true
 USE_CUSTOM_AUDIO_POLICY := 1
 
+# Override healthd HAL
+BOARD_HAL_STATIC_LIBRARIES := libhealthd.msm7x27a
+
 # Charger
 BOARD_CHARGER_RES := device/samsung/msm7627a-common/charger
 BOARD_BATTERY_DEVICE_NAME := "battery"
