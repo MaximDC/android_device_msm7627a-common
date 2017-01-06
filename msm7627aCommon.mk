@@ -21,6 +21,7 @@ $(call inherit-product, vendor/samsung/msm7627a-common/msm7627a-common-vendor.mk
 
 PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
+DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_common
 
 PRODUCT_TAGS += dalvik.gc.type-precise
 

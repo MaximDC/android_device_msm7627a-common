@@ -80,7 +80,7 @@ TARGET_KERNEL_CONFIG := delos_defconfig
 #PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
 endif
 ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
-DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay
+DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_delos
 else
 DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_arubaslim
 endif
