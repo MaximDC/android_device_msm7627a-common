@@ -79,7 +79,11 @@ else
 TARGET_KERNEL_CONFIG := delos_defconfig
 #PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
 endif
-
+ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
+DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay
+else
+DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_arubaslim
+endif
 # Use custom boot.mk until weritos releases his kernel source
 #ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
 #BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000 --cmdline "androidboot.hardware=qcom hack_lcd=1 chg_hack_lcd=0" --base 0x00200000 --pagesize 4096
