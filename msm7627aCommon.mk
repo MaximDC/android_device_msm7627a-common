@@ -19,8 +19,6 @@ $(call inherit-product, vendor/samsung/msm7627a-common/msm7627a-common-vendor.mk
 # The GPS configuration appropriate for this device.
 #$(call inherit-product, device/common/gps/gps_eu_supl.mk)
 
-DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay
-
 PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 
