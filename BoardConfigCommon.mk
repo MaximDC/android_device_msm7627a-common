@@ -71,25 +71,21 @@ BOARD_KERNEL_BASE := 0x00200000
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000 
 TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.7
-TARGET_KERNEL_SOURCE := kernel/samsung/msm7627a-common
 ifneq ($(filter arubaslim,$(TARGET_DEVICE)),)
 TARGET_KERNEL_CONFIG := arubaslim_defconfig
+TARGET_KERNEL_SOURCE := kernel/samsung/arubaslim
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8262.rle:root/initlogo.rle
 else
 TARGET_KERNEL_CONFIG := delos_defconfig
-#PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
+TARGET_KERNEL_SOURCE := kernel/samsung/delos3geur
+PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
 endif
 ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
 DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_delos
 else
 DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_arubaslim
 endif
-# Use custom boot.mk until weritos releases his kernel source
-#ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
-#BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000 --cmdline "androidboot.hardware=qcom hack_lcd=1 chg_hack_lcd=0" --base 0x00200000 --pagesize 4096
-#PREBUILTED_KERNEL_PATH := device/samsung/kernel/kernel
-#BOARD_CUSTOM_BOOTIMG_MK :=  device/samsung/msm7627a-common/bootimg.mk
-#endif
+
 # Hardware rendering
 BOARD_EGL_WORKAROUND_BUG_10194508 := true
 #BOARD_USE_MHEAP_SCREENSHOT := true
@@ -199,7 +195,7 @@ BOARD_RIL_CLASS := ../../../device/samsung/msm7627a-common/ril/
 #BOARD_HARDWARE_CLASS := device/samsung/msm7627a-common/cmhw
 
 # Lights
-TARGET_PROVIDES_LIBLIGHT := true
+BOARD_HAVE_GENERIC_BLN := true
 
 # SELinux
 BOARD_SEPOLICY_DIRS += device/samsung/msm7627a-common/sepolicy
