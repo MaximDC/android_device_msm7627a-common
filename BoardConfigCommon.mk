@@ -196,6 +196,7 @@ BOARD_RIL_CLASS := ../../../device/samsung/msm7627a-common/ril/
 
 # Lights
 BOARD_HAVE_GENERIC_BLN := true
+TARGET_PROVIDES_LIBLIGHT := true
 
 # SELinux
 BOARD_SEPOLICY_DIRS += device/samsung/msm7627a-common/sepolicy
