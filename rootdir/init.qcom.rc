@@ -401,9 +401,6 @@ service sensord /system/bin/sensord
 on property:wlan.driver.status=unloaded
     start hwmac
 
-service rmt_oeminfo /system/bin/rmt_oeminfo
-    class core
-
 service netmgrd /system/bin/netmgrd
     class main
 
