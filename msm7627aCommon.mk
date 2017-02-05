@@ -16,6 +16,8 @@
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
 $(call inherit-product, vendor/samsung/msm7627a-common/msm7627a-common-vendor.mk)
+$(call inherit-product, device/qcom/sepolicy/sepolicy.mk)
+
 # The GPS configuration appropriate for this device.
 #$(call inherit-product, device/common/gps/gps_eu_supl.mk)
 

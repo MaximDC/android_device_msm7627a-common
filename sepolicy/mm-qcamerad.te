@@ -1,0 +1,12 @@
+allow mm-qcamerad mm-qcamerad_exec:file execmod;
+allow mm-qcamerad system_file:file execmod;
+allow mm-qcamerad audio_device:dir search;
+allow mm-qcamerad audio_device:chr_file { read write };
+allow mm-qcamerad audio_device:chr_file open;
+allow mm-qcamerad audio_device:chr_file ioctl;
+allow mm-qcamerad system_data_file:dir write;
+allow mm-qcamerad system_data_file:dir add_name;
+allow mm-qcamerad system_data_file:dir remove_name;
+allow mm-qcamerad system_data_file:sock_file create;
+allow mm-qcamerad system_data_file:sock_file unlink;
+
