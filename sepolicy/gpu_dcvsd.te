@@ -1,6 +1,11 @@
 # gpu_dcvsd service
 type gpu_dcvsd, domain;
 type gpu_dcvsd_exec, exec_type, file_type;
+allow gpu_dcvsd device:chr_file { read write ioctl open };
+allow gpu_dcvsd gpu_dcvsd_exec:file execmod;
+allow gpu_dcvsd gpu_device:chr_file { read write ioctl open };
+allow gpu_dcvsd sysfs:file write;
+
 
 init_daemon_domain(gpu_dcvsd)
 
