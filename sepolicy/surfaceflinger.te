@@ -1,3 +1,1 @@
-#============= surfaceflinger ==============
-allow surfaceflinger kernel:system module_request;
 allow surfaceflinger shell_data_file:dir search;

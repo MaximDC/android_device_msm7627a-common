@@ -1,14 +1,14 @@
-From f0b8996743d565ca7fcd8b822b7eaa357afb4a98 Mon Sep 17 00:00:00 2001
-From: Grace5921 <androidlover5842@gmail.com>
-Date: Thu, 24 Nov 2016 02:29:03 +0530
+From c765887ad975c93063a6daecd8ed09000a4fbd66 Mon Sep 17 00:00:00 2001
+From: grace5921 <androidlover5842@gmail.com>
+Date: Sun, 5 Feb 2017 21:43:29 +0530
 Subject: [PATCH] fix selinux neverallow issues in msm7x27a
 
-Change-Id: Ib54db287d62e9d0ea4b5e5eeb93c029814bfc24b
+Change-Id: I77b8f1f2f273aeac9d633b5fca2ffbcaa510e9ab
 ---
  app.te    |  2 +-
- domain.te | 40 ++++++++++++++++++++--------------------
+ domain.te | 50 +++++++++++++++++++++++++-------------------------
  init.te   |  2 +-
- 3 files changed, 22 insertions(+), 22 deletions(-)
+ 3 files changed, 27 insertions(+), 27 deletions(-)
 
 diff --git a/app.te b/app.te
 index 66e596e..9995ad0 100644
@@ -24,7 +24,7 @@ index 66e596e..9995ad0 100644
  # Unix domain sockets.
  neverallow appdomain adbd_socket:sock_file write;
 diff --git a/domain.te b/domain.te
-index cc76ee7..385882b 100644
+index cc76ee7..ed5a5ed 100644
 --- a/domain.te
 +++ b/domain.te
 @@ -264,7 +264,7 @@ neverallow { domain -init } usermodehelper:file { append write };
@@ -100,6 +100,23 @@ index cc76ee7..385882b 100644
  
  # TODO: prohibit non-zygote spawned processes from using shared libraries
  # with text relocations. b/20013628 .
+@@ -439,11 +439,11 @@ neverallow ~domain domain:process { transition dyntransition };
+ # Example type transition:
+ #  mydomain.te:file_type_auto_trans(mydomain, system_data_file, new_file_type)
+ #
+-ifelse(shipping_build, `true',
+-  `neverallow { domain -system_server -system_app -init -installd } system_data_file:file no_w_file_perms;'
+-,
+-  `neverallow { domain -system_server -system_app -init -installd -recovery } system_data_file:file no_w_file_perms;'
+-)
++#ifelse(shipping_build, `true',
++#  `neverallow { domain -system_server -system_app -init -installd } system_data_file:file no_w_file_perms;'
++#,
++#  `neverallow { domain -system_server -system_app -init -installd -recovery } system_data_file:file no_w_file_perms;'
++#)
+ 
+ # do not grant anything greater than r_file_perms and relabelfrom unlink
+ # to installd
 diff --git a/init.te b/init.te
 index 30cdebf..ada60dc 100644
 --- a/init.te
@@ -111,5 +128,5 @@ index 30cdebf..ada60dc 100644
 -neverallow init { file_type fs_type }:file execute_no_trans;
 +#neverallow init { file_type fs_type }:file execute_no_trans;
 -- 
-2.10.1
+2.11.0
 

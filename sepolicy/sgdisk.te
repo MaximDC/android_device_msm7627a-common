@@ -1,2 +1,0 @@
-#============= sgdisk ==============
-allow sgdisk kernel:system module_request;

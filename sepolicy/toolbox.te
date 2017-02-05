@@ -1,3 +1,0 @@
-allow toolbox device:chr_file { read write };
-allow toolbox init:fifo_file read;
-allow toolbox kernel:system module_request;

@@ -1,4 +1,4 @@
-allow kernel self:capability dac_override;
-allow kernel unlabeled:file read;
-allow kernel system_data_file:dir write;
-allow kernel unlabeled:file { read write open };
+allow kernel efs_file:dir search;
+allow kernel system_data_file:file write;
+allow kernel unlabeled:file { read write };
+allow kernel unlabeled:file open;

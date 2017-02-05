@@ -1,0 +1,3 @@
+allow qmuxd qmuxd_exec:file execmod;
+allow qmuxd system_file:file execmod;
+

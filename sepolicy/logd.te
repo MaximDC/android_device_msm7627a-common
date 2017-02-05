@@ -1,3 +1,0 @@
-#============= logd ==============
-allow logd kernel:system module_request;
-

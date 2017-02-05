@@ -1,0 +1,7 @@
+allow netmgrd netmgrd_exec:file execmod;
+allow netmgrd system_file:file execmod;
+allow netmgrd self:packet_socket create;
+allow netmgrd self:packet_socket bind;
+allow netmgrd self:packet_socket write;
+allow netmgrd self:packet_socket read;
+
