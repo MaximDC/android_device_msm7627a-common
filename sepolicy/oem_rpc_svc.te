@@ -1,0 +1,6 @@
+# oem_rpc_svc service
+type oem_rpc_svc, domain;
+type oem_rpc_svc_exec, exec_type, file_type;
+
+init_daemon_domain(oem_rpc_svc)
+
