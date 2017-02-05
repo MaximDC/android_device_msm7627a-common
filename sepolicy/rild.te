@@ -1,2 +1,4 @@
 allow rild system_file:file execmod;
 allow rild system_data_file:sock_file write;
+allow rild oem_rpc_svc:unix_stream_socket connectto;
+

@@ -3,4 +3,5 @@ allow mediaserver self:capability sys_nice;
 allow mediaserver system_data_file:sock_file write;
 allow mediaserver device:chr_file { read write };
 allow mediaserver device:chr_file { ioctl open };
+allow mediaserver media_rw_data_file:file execute;
 

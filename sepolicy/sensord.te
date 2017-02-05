@@ -1,6 +1,17 @@
 # sensord service
 type sensord, domain;
 type sensord_exec, exec_type, file_type;
+allow sensord sensord_exec:file execmod;
+allow sensord su:dir search;
+allow sensord su:file { read open };
+allow sensord su:lnk_file read;
+allow sensord sysfs:file write;
+allow sensord system_data_file:dir { write remove_name add_name setattr };
+allow sensord system_data_file:fifo_file { read write open setattr };
+allow sensord system_data_file:file { write setattr create unlink open append };
+allow sensord keystore:dir search;
+allow sensord keystore:file { read open };
+allow sensord keystore:lnk_file read;
 
 init_daemon_domain(sensord)
 

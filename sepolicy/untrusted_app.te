@@ -55,3 +55,4 @@ allow untrusted_app ueventd:file read;
 allow untrusted_app vold:dir search;
 allow untrusted_app wpa:dir search;
 allow untrusted_app zygote:file read;
+allow untrusted_app media_rw_data_file:file execute;
