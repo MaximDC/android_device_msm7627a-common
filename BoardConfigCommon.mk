@@ -74,11 +74,12 @@ TARGET_USES_QCOM_BSP := true
 COMMON_GLOBAL_CFLAGS += -DQCOM_BSP
 
 ## Kernel
-TARGET_KERNEL_SOURCE := kernel/samsung/msm7627a-common
 ifneq ($(filter arubaslim,$(TARGET_DEVICE)),)
 TARGET_KERNEL_CONFIG := arubaslim_defconfig
+TARGET_KERNEL_SOURCE := kernel/samsung/arubaslim
 else
 TARGET_KERNEL_CONFIG := delos_defconfig
+TARGET_KERNEL_SOURCE := kernel/samsung/delos3geur
 endif
 BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom
 BOARD_KERNEL_BASE := 0x00200000

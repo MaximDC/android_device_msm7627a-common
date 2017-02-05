@@ -24,10 +24,6 @@ PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
 PRODUCT_LOCALES := hdpi
 
-## CMAccount
-PRODUCT_PACKAGES += \
-    CMAccount
-
 # Torch
 PRODUCT_PACKAGES += Torch
 
