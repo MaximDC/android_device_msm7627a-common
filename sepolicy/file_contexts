@@ -1,0 +1,4 @@
+/system/bin/sensord   u:object_r:sensord_exec:s0
+/system/bin/oem_rpc_svc   u:object_r:oem_rpc_svc_exec:s0
+/system/bin/gpu_dcvsd   u:object_r:gpu_dcvsd_exec:s0
+

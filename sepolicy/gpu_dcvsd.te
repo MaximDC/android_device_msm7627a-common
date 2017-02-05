@@ -1,0 +1,6 @@
+# gpu_dcvsd service
+type gpu_dcvsd, domain;
+type gpu_dcvsd_exec, exec_type, file_type;
+
+init_daemon_domain(gpu_dcvsd)
+
