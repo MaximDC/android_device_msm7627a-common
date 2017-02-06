@@ -2,4 +2,6 @@ allow system_server system_file:file execmod;
 allow system_server device:chr_file { read write getattr };
 allow system_server media_rw_data_file:file { execute open };
 allow system_server device:chr_file open;
+allow system_server efs_file:dir search;
+
 

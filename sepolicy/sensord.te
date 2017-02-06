@@ -12,6 +12,9 @@ allow sensord system_data_file:file { write setattr create unlink open append };
 allow sensord keystore:dir search;
 allow sensord keystore:file { read open };
 allow sensord keystore:lnk_file read;
+allow sensord efs_file:dir search;
+allow sensord input_device:dir search;
+allow sensord netmgrd:dir search;
 
 init_daemon_domain(sensord)
 
