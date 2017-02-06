@@ -1,3 +1,4 @@
 allow surfaceflinger shell_data_file:dir search;
 allow surfaceflinger media_rw_data_file:file { read getattr open execute };
+allow surfaceflinger device:chr_file { read write ioctl open };
 

@@ -15,6 +15,10 @@ allow sensord keystore:lnk_file read;
 allow sensord efs_file:dir search;
 allow sensord input_device:dir search;
 allow sensord netmgrd:dir search;
+allow sensord netmgrd:file read;
+allow sensord installd:dir search;
+allow sensord system_data_file:dir create;
+allow sensord system_data_file:fifo_file create;
 
 init_daemon_domain(sensord)
 

@@ -5,7 +5,6 @@ allow gpu_dcvsd device:chr_file { read write ioctl open };
 allow gpu_dcvsd gpu_dcvsd_exec:file execmod;
 allow gpu_dcvsd gpu_device:chr_file { read write ioctl open };
 allow gpu_dcvsd sysfs:file write;
-
-
+allow gpu_dcvsd system_file:file execmod;
 init_daemon_domain(gpu_dcvsd)
 

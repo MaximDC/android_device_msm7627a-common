@@ -37,7 +37,7 @@ TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a9 -mfpu=neon-vfpv4 -mfloat-abi=softfp
 BOARD_USES_QCOM_HARDWARE := true
 COMMON_GLOBAL_CFLAGS += -DQCOM_HARDWARE
 TARGET_USES_ION := true
-
+BOARD_USES_PMEM_ADSP := true
 ifneq ($(filter arubaslim,$(TARGET_DEVICE)),)
 TARGET_OTA_ASSERT_DEVICE := arubaslim,GT-I8262,I8262
 else
