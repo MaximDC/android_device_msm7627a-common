@@ -1,8 +1,4 @@
 allow rmt_storage rmt_storage_exec:file execmod;
-allow rmt_storage device:chr_file { read write };
-allow rmt_storage device:chr_file open;
-allow rmt_storage block_device:blk_file read;
-allow rmt_storage block_device:blk_file open;
-allow rmt_storage block_device:blk_file write;
-allow rmt_storage device:chr_file ioctl;
+allow rmt_storage device:chr_file { read write open ioctl };
+allow rmt_storage block_device:blk_file { read open write };
 

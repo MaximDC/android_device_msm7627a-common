@@ -1,5 +1,4 @@
 allow bluetooth btnvtool_exec:file execmod;
 allow bluetooth unlabeled:dir search;
-allow bluetooth unlabeled:file getattr;
-allow bluetooth unlabeled:file { read open };
+allow bluetooth unlabeled:file { getattr read open };
 
