@@ -36,8 +36,6 @@ TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a9 -mfpu=neon-vfpv4 -mfloat-abi=softfp
 # Qualcomm hardware
 BOARD_USES_QCOM_HARDWARE := true
 COMMON_GLOBAL_CFLAGS += -DQCOM_HARDWARE
-TARGET_USES_ION := true
-BOARD_USES_PMEM_ADSP := true
 ifneq ($(filter arubaslim,$(TARGET_DEVICE)),)
 TARGET_OTA_ASSERT_DEVICE := arubaslim,GT-I8262,I8262
 else
@@ -171,6 +169,11 @@ BOARD_ADRENO_DECIDE_TEXTURE_TARGET := true
 TARGET_NO_COMPAT_GRALLOC_PERFORM := true
 USE_OPENGL_RENDERER := true
 TARGET_DISPLAY_USE_RETIRE_FENCE := true
+TARGET_USES_ION := true
+ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
+COMMON_GLOBAL_CFLAGS += -DHAVE_NEW_GRALLOC
+endif
+BOARD_USES_PMEM_ADSP := true
 
 # Camera
 #USE_DEVICE_SPECIFIC_CAMERA := true
