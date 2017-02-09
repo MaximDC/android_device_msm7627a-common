@@ -1,32 +1,18 @@
-From 590b99326081521535f56912974691f1dc0fd1bc Mon Sep 17 00:00:00 2001
+From b073e3c6ef3d80c7ad5577dfbdf1f8da1d3631e4 Mon Sep 17 00:00:00 2001
 From: Grace5921 <androidlover5842@gmail.com>
 Date: Mon, 10 Oct 2016 06:11:20 +0530
 Subject: [PATCH] Merge all Selinux Patches needed by Bluez
 
 Change-Id: If3204ea57cee6369d84e5ee41f1465b56291693a
 ---
- bluetooth.te        |  2 +-
  bluetoothd.te       | 47 +++++++++++++++++++++++++++++++++++++++++++++++
  bluetoothd_snoop.te | 17 +++++++++++++++++
  file_contexts       |  6 ++++++
  init.te             |  2 +-
- 5 files changed, 72 insertions(+), 2 deletions(-)
+ 4 files changed, 71 insertions(+), 1 deletion(-)
  create mode 100644 bluetoothd.te
  create mode 100644 bluetoothd_snoop.te
 
-diff --git a/bluetooth.te b/bluetooth.te
-index 816fcb3..5ea5dbf 100644
---- a/bluetooth.te
-+++ b/bluetooth.te
-@@ -26,7 +26,7 @@ allow bluetooth { tun_device uhid_device hci_attach_dev }:chr_file rw_file_perms
- # but may be getting used for other non-bluetooth sockets that has no
- # specific class defined.  Consider taking to specific domains.
- allow { bluetoothdomain -untrusted_app -isolated_app -shell } self:socket create_socket_perms;
--neverallow { untrusted_app isolated_app shell } { untrusted_app isolated_app shell }:socket *;
-+#neverallow { untrusted_app isolated_app shell } { untrusted_app isolated_app shell }:socket *;
- 
- # sysfs access.
- allow bluetooth sysfs_bluetooth_writable:file rw_file_perms;
 diff --git a/bluetoothd.te b/bluetoothd.te
 new file mode 100644
 index 0000000..532bfbb
@@ -104,10 +90,10 @@ index 0000000..ef817b5
 +allow bluetoothd_snoop fuse:dir w_dir_perms;
 +allow bluetoothd_snoop fuse:file create_file_perms;
 diff --git a/file_contexts b/file_contexts
-index d964f9b..89bfa7f 100644
+index 3d91e2b..4092e1b 100644
 --- a/file_contexts
 +++ b/file_contexts
-@@ -311,6 +311,12 @@
+@@ -395,6 +395,12 @@
  /data/app-asec(/.*)?        u:object_r:asec_image_file:s0
  
  #############################
@@ -121,10 +107,10 @@ index d964f9b..89bfa7f 100644
  /mnt/media_rw(/.*)?         u:object_r:mnt_media_rw_file:s0
  /mnt/user(/.*)?             u:object_r:mnt_user_file:s0
 diff --git a/init.te b/init.te
-index 80883e6..ada60dc 100644
+index 9bc78d1..75c3dfa 100644
 --- a/init.te
 +++ b/init.te
-@@ -73,7 +73,7 @@ allow init self:capability dac_override;
+@@ -74,7 +74,7 @@ allow init self:capability dac_override;
  # Set system clock.
  allow init self:capability sys_time;
  
@@ -134,5 +120,5 @@ index 80883e6..ada60dc 100644
  # Mounting filesystems from block devices.
  allow init dev_type:blk_file r_file_perms;
 -- 
-2.10.1
+2.11.0
 

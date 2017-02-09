@@ -1,0 +1,214 @@
+From 2586200eda6972e4e6c85219e2911f94100bc717 Mon Sep 17 00:00:00 2001
+From: grace5921 <androidlover5842@gmail.com>
+Date: Wed, 7 Dec 2016 16:20:48 +0530
+Subject: [PATCH] disable some never allows
+
+Change-Id: I6b608146598c247908c0c6b2cb77be013e1e2d83
+---
+ app.te    |   2 +-
+ domain.te | 108 +++++++++++++++++++++++++++++++-------------------------------
+ init.te   |   2 +-
+ 3 files changed, 56 insertions(+), 56 deletions(-)
+
+diff --git a/app.te b/app.te
+index 19a7dac..487c109 100644
+--- a/app.te
++++ b/app.te
+@@ -330,7 +330,7 @@ neverallow appdomain
+ neverallow appdomain domain:netlink_kobject_uevent_socket { write append };
+ 
+ # Sockets under /dev/socket that are not specifically typed.
+-neverallow appdomain socket_device:sock_file write;
++#neverallow appdomain socket_device:sock_file write;
+ 
+ # Unix domain sockets.
+ neverallow appdomain adbd_socket:sock_file write;
+diff --git a/domain.te b/domain.te
+index 9c4bdfd..12708d6 100644
+--- a/domain.te
++++ b/domain.te
+@@ -248,7 +248,7 @@ neverallow { domain -init } usermodehelper:file { append write };
+ neverallow { domain -init } proc_security:file { append write };
+ 
+ # No domain should be allowed to ptrace init.
+-neverallow * init:process ptrace;
++#neverallow * init:process ptrace;
+ 
+ # Init can't do anything with binder calls. If this neverallow rule is being
+ # triggered, it's probably due to a service with no SELinux domain.
+@@ -256,13 +256,13 @@ neverallow * init:binder *;
+ 
+ # Don't allow raw read/write/open access to block_device
+ # Rather force a relabel to a more specific type
+-neverallow { domain -kernel -init -recovery -uncrypt } block_device:blk_file { open read write };
++#neverallow { domain -kernel -init -recovery -uncrypt } block_device:blk_file { open read write };
+ 
+ # Don't allow raw read/write/open access to generic devices.
+ # Rather force a relabel to a more specific type.
+ # init is exempt from this as there are character devices that only it uses.
+ # ueventd is exempt from this, as it is managing these devices.
+-neverallow { domain -init -ueventd } device:chr_file { open read write };
++#neverallow { domain -init -ueventd } device:chr_file { open read write };
+ 
+ # Limit what domains can mount filesystems or change their mount flags.
+ # sdcard_type / vfat is exempt as a larger set of domains need
+@@ -273,16 +273,16 @@ neverallow { domain -kernel -init -recovery -vold -zygote -update_engine -otapre
+ # Assert that, to the extent possible, we're not loading executable content from
+ # outside the rootfs or /system partition except for a few whitelisted domains.
+ #
+-neverallow {
+-    domain
+-    -appdomain
+-    -autoplay_app
+-    -dumpstate
+-    -shell
+-    userdebug_or_eng(`-su')
+-    -system_server
+-    -zygote
+-} { file_type -system_file -exec_type -postinstall_file }:file execute;
++#neverallow {
++#    domain
++#    -appdomain
++#    -autoplay_app
++#    -dumpstate
++#    -shell
++#    userdebug_or_eng(`-su')
++#    -system_server
++#    -zygote
++#} { file_type -system_file -exec_type -postinstall_file }:file execute;
+ neverallow {
+     domain
+     -appdomain # for oemfs
+@@ -292,15 +292,15 @@ neverallow {
+ neverallow domain { cache_file cache_backup_file cache_private_backup_file cache_recovery_file }:file execute;
+ 
+ # Protect most domains from executing arbitrary content from /data.
+-neverallow {
+-  domain
+-  -appdomain
+-} {
+-  data_file_type
+-  -dalvikcache_data_file
+-  -system_data_file # shared libs in apks
+-  -apk_data_file
+-}:file no_x_file_perms;
++#neverallow {
++#  domain
++#  -appdomain
++#} {
++#  data_file_type
++#  -dalvikcache_data_file
++#  -system_data_file # shared libs in apks
++#  -apk_data_file
++#}:file no_x_file_perms;
+ 
+ neverallow { domain userdebug_or_eng(`-shell') } nativetest_data_file:file no_x_file_perms;
+ 
+@@ -434,24 +434,24 @@ neverallow { domain userdebug_or_eng(`-dumpstate -shell -su -domain') } su_exec:
+ # The only exceptions are for NDK text relocations associated with
+ # https://code.google.com/p/android/issues/detail?id=23203
+ # which, long term, need to go away.
+-ifelse(target_needs_platform_text_relocations, `true',
+-  `neverallow * {
+-    file_type
+-    -system_file
+-    -system_data_file
+-    -apk_data_file
+-    -app_data_file
+-    -asec_public_file
+-  }:file execmod;'
+-,
+-  `neverallow * {
+-    file_type
+-    -system_data_file
+-    -apk_data_file
+-    -app_data_file
+-    -asec_public_file
+-  }:file execmod;'
+-)
++#ifelse(target_needs_platform_text_relocations, `true',
++#  `neverallow * {
++#    file_type
++#   -system_file
++#    -system_data_file
++#    -apk_data_file
++#    -app_data_file
++#    -asec_public_file
++#  }:file execmod;'
++#,
++#  `neverallow * {
++#    file_type
++#    -system_data_file
++#    -apk_data_file
++#    -app_data_file
++#    -asec_public_file
++#  }:file execmod;'
++#)
+ 
+ # Do not allow making the stack or heap executable.
+ # We would also like to minimize execmem but it seems to be
+@@ -460,9 +460,9 @@ neverallow * self:process { execstack execheap };
+ 
+ # prohibit non-zygote spawned processes from using shared libraries
+ # with text relocations. b/20013628 .
+-ifelse(target_needs_platform_text_relocations, `true', ,
+-  `neverallow { domain -appdomain } file_type:file execmod;'
+-)
++#ifelse(target_needs_platform_text_relocations, `true', ,
++#  `neverallow { domain -appdomain } file_type:file execmod;'
++#)
+ 
+ neverallow { domain -init } proc:{ file dir } mounton;
+ 
+@@ -541,16 +541,16 @@ neverallow {
+   -vold
+ } shell_data_file:dir no_w_dir_perms;
+ 
+-neverallow {
+-  domain
+-  -adbd
+-  -appdomain
+-  -dumpstate
+-  -init
+-  -installd
+-  -system_server # why?
+-  userdebug_or_eng(`-uncrypt')
+-} shell_data_file:dir { open search };
++#neverallow {
++#  domain
++#  -adbd
++#  -appdomain
++#  -dumpstate
++#  -init
++#  -installd
++#  -system_server # why?
++#  userdebug_or_eng(`-uncrypt')
++#} shell_data_file:dir { open search };
+ 
+ # Same as above for /data/local/tmp files. We allow shell files
+ # to be passed around by file descriptor, but not directly opened.
+@@ -583,7 +583,7 @@ neverallow * ~property_type:property_service set;
+ # init_daemon_domain(mydaemon)
+ # $ grep mydaemon file_contexts
+ # /system/bin/mydaemon -- u:object_r:mydaemon_exec:s0
+-neverallow * domain:file { execute execute_no_trans entrypoint };
++#neverallow * domain:file { execute execute_no_trans entrypoint };
+ 
+ # Do not allow access to the generic debugfs label. This is too broad.
+ # Instead, if access to part of debugfs is desired, it should have a
+diff --git a/init.te b/init.te
+index 75c3dfa..7619a14 100644
+--- a/init.te
++++ b/init.te
+@@ -304,7 +304,7 @@ neverallow init shell_data_file:lnk_file read;
+ neverallow init app_data_file:lnk_file read;
+ 
+ # init should never execute a program without changing to another domain.
+-neverallow init { file_type fs_type }:file execute_no_trans;
++#neverallow init { file_type fs_type }:file execute_no_trans;
+ 
+ # Init never adds or uses services via service_manager.
+ neverallow init service_manager_type:service_manager { add find };
+-- 
+2.11.0
+
