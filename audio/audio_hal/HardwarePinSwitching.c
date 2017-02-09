@@ -123,7 +123,7 @@ static int marimba_write
               msgs[0].buf = (__u8*)offset_data;
               msgs[0].len = (1 + len) * sizeof(*offset_data);
 
-        if (NULL == offset_data) {
+        if (*offset_data) {
                 return -1;
         }
 
@@ -224,7 +224,7 @@ extern int switch_mode( int nMode ) {
     //media server doesnt have permissions to update
     return 0;
 #endif
-#ifdef WITH_QCOM_FM
+#ifdef QCOM_FM_ENABLED
     i2cfd = open(FM_DEVICE_PATH, O_RDWR);
     if( i2cfd >= 0) {
         rc = switch_pins(i2cfd, nMode);
