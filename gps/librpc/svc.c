@@ -49,7 +49,6 @@
 #include <rpc/rpc_router_ioctl.h>
 #include <debug.h>
 #include <pthread.h>
-#include <stdlib.h>
 
 extern XDR *xdr_init_common(const char *name, int is_client);
 extern void xdr_destroy_common(XDR *xdr);
