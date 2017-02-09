@@ -1,26 +1,66 @@
-From 9ad89ad5c517e6f13b9834651d19177c340f8d56 Mon Sep 17 00:00:00 2001
+From 0fbe4af1eabcb9125ba20fe1047b14cad7f72f88 Mon Sep 17 00:00:00 2001
 From: weritos6666 <weritos94@gmail.com>
 Date: Fri, 4 Mar 2016 14:15:34 +0500
 Subject: [PATCH] Fix_wifi_Hotspot
 
 ---
- server/SoftapController.cpp | 26 ++++----------------------
- 1 file changed, 4 insertions(+), 22 deletions(-)
+ server/Android.mk           |  8 ++++----
+ server/SoftapController.cpp | 25 +++----------------------
+ 2 files changed, 7 insertions(+), 26 deletions(-)
 
+diff --git a/server/Android.mk b/server/Android.mk
+index 26beffa..e32912f 100644
+--- a/server/Android.mk
++++ b/server/Android.mk
+@@ -19,7 +19,7 @@ LOCAL_PATH := $(call my-dir)
+ ###
+ include $(CLEAR_VARS)
+ 
+-LOCAL_CFLAGS := -Wall -Werror
++LOCAL_CFLAGS := -Wall
+ LOCAL_CLANG := true
+ LOCAL_MODULE := libnetdaidl
+ LOCAL_SHARED_LIBRARIES := \
+@@ -46,7 +46,7 @@ LOCAL_C_INCLUDES := \
+         system/netd/include \
+ 
+ LOCAL_CLANG := true
+-LOCAL_CPPFLAGS := -std=c++11 -Wall -Werror
++LOCAL_CPPFLAGS := -std=c++11 -Wall
+ LOCAL_MODULE := netd
+ 
+ LOCAL_INIT_RC := netd.rc
+@@ -131,7 +131,7 @@ include $(BUILD_EXECUTABLE)
+ ###
+ include $(CLEAR_VARS)
+ 
+-LOCAL_CFLAGS := -Wall -Werror
++LOCAL_CFLAGS := -Wall
+ LOCAL_CLANG := true
+ LOCAL_MODULE := ndc
+ LOCAL_SHARED_LIBRARIES := libcutils
+@@ -144,7 +144,7 @@ include $(BUILD_EXECUTABLE)
+ ###
+ include $(CLEAR_VARS)
+ LOCAL_MODULE := netd_unit_test
+-LOCAL_CFLAGS := -Wall -Werror -Wunused-parameter
++#LOCAL_CFLAGS := -Wall
+ LOCAL_C_INCLUDES := \
+         system/netd/include \
+         system/netd/server \
 diff --git a/server/SoftapController.cpp b/server/SoftapController.cpp
-index 27ed684..9793248 100755
+index 27ed684..fd696dd 100755
 --- a/server/SoftapController.cpp
 +++ b/server/SoftapController.cpp
-@@ -60,7 +60,7 @@ static const char HOSTAPD_DHCP_DIR[]    = "/data/misc/dhcp";
+@@ -60,7 +60,6 @@ static const char HOSTAPD_DHCP_DIR[]    = "/data/misc/dhcp";
  static const char HOSTAPD_CONF_FILE[]    = "/data/misc/wifi/hostapd.conf";
  static const char HOSTAPD_BIN_FILE[]    = "/system/bin/hostapd";
  static const char HOSTAPD_SOCKETS_DIR[]    = "/data/misc/wifi/sockets";
 -static const char WIFI_HOSTAPD_GLOBAL_CTRL_IFACE[] = "/data/misc/wifi/hostapd/global";
-+/*static const char WIFI_HOSTAPD_GLOBAL_CTRL_IFACE[] = "/data/misc/wifi/hostapd/global";*/
  
  SoftapController::SoftapController()
      : mPid(0) {}
-@@ -155,35 +155,17 @@ void *SoftapController::threadStart(void *obj){
+@@ -155,35 +154,17 @@ void *SoftapController::threadStart(void *obj){
  int SoftapController::startSoftap(bool global_ctrl_iface, SocketClient *socketClient = NULL) {
      pid_t pid = 1;
      DIR *dir = NULL;
@@ -60,5 +100,5 @@ index 27ed684..9793248 100755
          }
          ALOGE("SoftAP failed to start");
 -- 
-2.10.1
+2.11.0
 

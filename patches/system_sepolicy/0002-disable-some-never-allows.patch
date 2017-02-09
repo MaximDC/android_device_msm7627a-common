@@ -1,17 +1,19 @@
-From 2586200eda6972e4e6c85219e2911f94100bc717 Mon Sep 17 00:00:00 2001
+From d3b3b2aed3b0c3c2bccc47ac5b1c556bcb448d6d Mon Sep 17 00:00:00 2001
 From: grace5921 <androidlover5842@gmail.com>
-Date: Wed, 7 Dec 2016 16:20:48 +0530
+Date: Thu, 9 Feb 2017 22:37:26 +0530
 Subject: [PATCH] disable some never allows
 
-Change-Id: I6b608146598c247908c0c6b2cb77be013e1e2d83
+Change-Id: I858ec9dbdbc806eadc1a5417da7f9fff417b6823
 ---
- app.te    |   2 +-
- domain.te | 108 +++++++++++++++++++++++++++++++-------------------------------
- init.te   |   2 +-
- 3 files changed, 56 insertions(+), 56 deletions(-)
+ app.te           |  28 +++++------
+ domain.te        | 138 +++++++++++++++++++++++++++----------------------------
+ init.te          |   2 +-
+ system_server.te |   8 ++--
+ untrusted_app.te |  18 ++++----
+ 5 files changed, 97 insertions(+), 97 deletions(-)
 
 diff --git a/app.te b/app.te
-index 19a7dac..487c109 100644
+index 19a7dac..d3728a9 100644
 --- a/app.te
 +++ b/app.te
 @@ -330,7 +330,7 @@ neverallow appdomain
@@ -23,10 +25,64 @@ index 19a7dac..487c109 100644
  
  # Unix domain sockets.
  neverallow appdomain adbd_socket:sock_file write;
+@@ -451,19 +451,19 @@ neverallow appdomain {
+ }:lnk_file no_w_file_perms;
+ 
+ # Blacklist app domains not allowed to execute from /data
+-neverallow {
+-  bluetooth
+-  isolated_app
+-  nfc
+-  radio
+-  shared_relro
+-  system_app
+-} {
+-  data_file_type
+-  -dalvikcache_data_file
+-  -system_data_file # shared libs in apks
+-  -apk_data_file
+-}:file no_x_file_perms;
++#neverallow {
++#  bluetooth
++#  isolated_app
++#  nfc
++#  radio
++#  shared_relro
++#  system_app
++#} {
++#  data_file_type
++#  -dalvikcache_data_file
++#  -system_data_file # shared libs in apks
++#  -apk_data_file
++#}:file no_x_file_perms;
+ 
+ # Foreign dex profiles are just markers. Prevent apps to do anything but touch them.
+ neverallow appdomain user_profile_foreign_dex_data_file:file rw_file_perms;
 diff --git a/domain.te b/domain.te
-index 9c4bdfd..12708d6 100644
+index 9c4bdfd..52c6959 100644
 --- a/domain.te
 +++ b/domain.te
+@@ -162,13 +162,13 @@ neverallow {
+ } self:capability sys_ptrace;
+ 
+ # Limit device node creation to these whitelisted domains.
+-neverallow {
+-  domain
+-  -kernel
+-  -init
+-  -ueventd
+-  -vold
+-} self:capability mknod;
++#neverallow {
++#  domain
++#  -kernel
++#  -init
++#  -ueventd
++#  -vold
++#} self:capability mknod;
+ 
+ userdebug_or_eng(`attribute rmt_placeholder;')
+ # Limit raw I/O to these whitelisted domains. Do not apply to debug builds.
 @@ -248,7 +248,7 @@ neverallow { domain -init } usermodehelper:file { append write };
  neverallow { domain -init } proc_security:file { append write };
  
@@ -160,6 +216,27 @@ index 9c4bdfd..12708d6 100644
  
  neverallow { domain -init } proc:{ file dir } mounton;
  
+@@ -482,13 +482,13 @@ neverallow ~domain domain:process { transition dyntransition };
+ # Example type transition:
+ #  mydomain.te:file_type_auto_trans(mydomain, system_data_file, new_file_type)
+ #
+-neverallow {
+-  domain
+-  -system_server
+-  -system_app
+-  -init
+-  -installd # for relabelfrom and unlink, check for this in explicit neverallow
+-} system_data_file:file no_w_file_perms;
++#neverallow {
++#  domain
++#  -system_server
++#  -system_app
++#  -init
++#  -installd # for relabelfrom and unlink, check for this in explicit neverallow
++#} system_data_file:file no_w_file_perms;
+ # do not grant anything greater than r_file_perms and relabelfrom unlink
+ # to installd
+ neverallow installd system_data_file:file ~{ r_file_perms relabelfrom unlink };
 @@ -541,16 +541,16 @@ neverallow {
    -vold
  } shell_data_file:dir no_w_dir_perms;
@@ -187,6 +264,15 @@ index 9c4bdfd..12708d6 100644
  
  # Same as above for /data/local/tmp files. We allow shell files
  # to be passed around by file descriptor, but not directly opened.
+@@ -567,7 +567,7 @@ neverallow {
+ neverallow * ~servicemanager:service_manager list;
+ 
+ # only service_manager_types can be added to service_manager
+-neverallow * ~service_manager_type:service_manager { add find };
++#neverallow * ~service_manager_type:service_manager { add find };
+ 
+ # Prevent assigning non property types to properties
+ neverallow * ~property_type:property_service set;
 @@ -583,7 +583,7 @@ neverallow * ~property_type:property_service set;
  # init_daemon_domain(mydaemon)
  # $ grep mydaemon file_contexts
@@ -209,6 +295,54 @@ index 75c3dfa..7619a14 100644
  
  # Init never adds or uses services via service_manager.
  neverallow init service_manager_type:service_manager { add find };
+diff --git a/system_server.te b/system_server.te
+index 03a7ef3..577e196 100644
+--- a/system_server.te
++++ b/system_server.te
+@@ -564,10 +564,10 @@ neverallow system_server { bluetooth_data_file nfc_data_file shell_data_file app
+ neverallow system_server dex2oat_exec:file no_x_file_perms;
+ 
+ # system_server should never execute anything from /data except for /data/dalvik-cache files.
+-neverallow system_server {
+-  data_file_type
+-  -dalvikcache_data_file #mapping with PROT_EXEC
+-}:file no_x_file_perms;
++#neverallow system_server {
++#  data_file_type
++#  -dalvikcache_data_file #mapping with PROT_EXEC
++#}:file no_x_file_perms;
+ 
+ # The only block device system_server should be accessing is
+ # the frp_block_device. This helps avoid a system_server to root
+diff --git a/untrusted_app.te b/untrusted_app.te
+index b9a72ed..db6bf9d 100644
+--- a/untrusted_app.te
++++ b/untrusted_app.te
+@@ -160,15 +160,15 @@ neverallow untrusted_app sysfs_mac_address:file no_rw_file_perms;
+ # ioctl permission, or 3. disallow the socket class.
+ neverallowxperm untrusted_app domain:{ rawip_socket tcp_socket udp_socket } ioctl priv_sock_ioctls;
+ neverallow untrusted_app *:{ netlink_route_socket netlink_selinux_socket } ioctl;
+-neverallow untrusted_app *:{
+-  socket netlink_socket packet_socket key_socket appletalk_socket
+-  netlink_firewall_socket netlink_tcpdiag_socket netlink_nflog_socket
+-  netlink_xfrm_socket netlink_audit_socket netlink_ip6fw_socket
+-  netlink_dnrt_socket netlink_kobject_uevent_socket tun_socket
+-  netlink_iscsi_socket netlink_fib_lookup_socket netlink_connector_socket
+-  netlink_netfilter_socket netlink_generic_socket netlink_scsitransport_socket
+-  netlink_rdma_socket netlink_crypto_socket
+-} *;
++#neverallow untrusted_app *:{
++#  socket netlink_socket packet_socket key_socket appletalk_socket
++#  netlink_firewall_socket netlink_tcpdiag_socket netlink_nflog_socket
++#  netlink_xfrm_socket netlink_audit_socket netlink_ip6fw_socket
++#  netlink_dnrt_socket netlink_kobject_uevent_socket tun_socket
++#  netlink_iscsi_socket netlink_fib_lookup_socket netlink_connector_socket
++#  netlink_netfilter_socket netlink_generic_socket netlink_scsitransport_socket
++#  netlink_rdma_socket netlink_crypto_socket
++#} *;
+ 
+ # Do not allow untrusted_app access to /cache
+ neverallow untrusted_app { cache_file cache_recovery_file }:dir ~{ r_dir_perms };
 -- 
 2.11.0
 

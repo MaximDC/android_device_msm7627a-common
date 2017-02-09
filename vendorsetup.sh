@@ -9,19 +9,19 @@ fi
 
 function delos3geur
 {
-lunch cm_delos3geur-userdebug
+lunch lineage_delos3geur-userdebug
 make -j4 bacon
 }
 function delos3geur_select
 {
-lunch cm_delos3geur-userdebug
+lunch lineage_delos3geur-userdebug
 }
 function arubaslim
 {
-lunch cm_arubaslim-userdebug
+lunch lineage_arubaslim-userdebug
 make -j4 bacon
 }
 function arubaslim_select
 {
-lunch cm_arubaslim-userdebug
+lunch lineage_arubaslim-userdebug
 }
