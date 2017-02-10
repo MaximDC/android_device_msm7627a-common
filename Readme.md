@@ -30,8 +30,6 @@ Device tree for Galaxy Win GT-I8552 (2 SIM)
 <project path="hardware/qcom/display-caf/msm7x27a" name="I8552-CM/hardware_qcom_display-caf" revision="cm-14.0" />
 <project path="hardware/qcom/media-caf/msm7x27a" name="SlimLP-Y300/hardware_qcom_media" revision="lp5.1" />
 <project path="hardware/atheros/wlan" name="CM13-Y300/android_hardware_atheros_wlan" remote="github" revision="cm-13.0" />
-<remove-project name="android_hardware_qcom_gps" />
-<project path="hardware/qcom/gps" name="CM13-Y300/android_hardware_qcom_gps" revision="cm-13.0" />
 <project path="hardware/ril-legacy" name="TeamHackLG/android_hardware_ril-legacy" revision="cm-14.1" />
 <project path="external/stlport" name="CyanogenMod/android_external_stlport" revision="cm-13.0" />
 </manifest>
