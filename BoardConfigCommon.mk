@@ -76,7 +76,7 @@ TARGET_KERNEL_SOURCE := kernel/samsung/arubaslim
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8262.rle:root/initlogo.rle
 else
 TARGET_KERNEL_CONFIG := delos_defconfig
-TARGET_KERNEL_SOURCE := kernel/samsung/delos3geur
+TARGET_KERNEL_SOURCE := kernel/samsung/arubaslim
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
 endif
 ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
@@ -84,6 +84,7 @@ DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_delos
 else
 DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_arubaslim
 endif
+KERNEL_HAS_FINIT_MODULE := false
 
 # Hardware rendering
 BOARD_EGL_WORKAROUND_BUG_10194508 := true

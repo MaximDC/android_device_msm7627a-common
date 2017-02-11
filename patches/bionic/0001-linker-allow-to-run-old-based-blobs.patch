@@ -1,0 +1,47 @@
+From 1ece82edddbd74a29f158b943a023768f3b775a5 Mon Sep 17 00:00:00 2001
+From: grace5921 <androidlover5842@gmail.com>
+Date: Sat, 11 Feb 2017 22:00:11 +0530
+Subject: [PATCH] linker: allow to run old based blobs
+
+Change-Id: Ia9fd4144f56276f4396d7146c0f4810d0d03e8a0
+---
+ linker/linker.cpp | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
+
+diff --git a/linker/linker.cpp b/linker/linker.cpp
+index bff9b9fc6..8201b59f8 100644
+--- a/linker/linker.cpp
++++ b/linker/linker.cpp
+@@ -4053,24 +4053,21 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t&
+   if (has_text_relocations) {
+     // Fail if app is targeting sdk version > 22
+ #if !defined(__i386__) // ffmpeg says that they require text relocations on x86
+-#if defined(TARGET_NEEDS_PLATFORM_TEXT_RELOCATIONS)
+     if (get_application_target_sdk_version() != __ANDROID_API__
+         && get_application_target_sdk_version() > 22) {
+-#else
+-    if (get_application_target_sdk_version() > 22) {
+-#endif
+-      PRINT("%s: has text relocations", get_realpath());
+-      DL_ERR("%s: has text relocations", get_realpath());
++
++      /*PRINT("%s: has text relocations", get_realpath());*/
++      DEBUG("%s: has text relocations", get_realpath());
+       return false;
+     }
+ #endif
+     // Make segments writable to allow text relocations to work properly. We will later call
+     // phdr_table_protect_segments() after all of them are applied.
+-    DL_WARN("%s has text relocations. This is wasting memory and prevents "
++    DEBUG("%s has text relocations. This is wasting memory and prevents "
+             "security hardening. Please fix.", get_realpath());
+     add_dlwarning(get_realpath(), "text relocations");
+     if (phdr_table_unprotect_segments(phdr, phnum, load_bias) < 0) {
+-      DL_ERR("can't unprotect loadable segments for \"%s\": %s",
++      DEBUG("can't unprotect loadable segments for \"%s\": %s",
+              get_realpath(), strerror(errno));
+       return false;
+     }
+-- 
+2.11.0
+
