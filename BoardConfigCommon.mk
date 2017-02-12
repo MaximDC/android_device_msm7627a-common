@@ -76,7 +76,7 @@ TARGET_KERNEL_SOURCE := kernel/samsung/arubaslim
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8262.rle:root/initlogo.rle
 else
 TARGET_KERNEL_CONFIG := delos_defconfig
-TARGET_KERNEL_SOURCE := kernel/samsung/arubaslim
+TARGET_KERNEL_SOURCE := kernel/samsung/delos3geur
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/initlogo_i8552.rle:root/initlogo.rle
 endif
 ifneq ($(filter delos3geur,$(TARGET_DEVICE)),)
@@ -152,7 +152,7 @@ BOARD_LPM_BOOT_ARGUMENT_VALUE := true
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_CSR := true
-
+BOARD_HAVE_BLUETOOTH_BLUEZ := true
 # GPS
 #QCOM_GPS_PATH := hardware/qcom/gps
 QCOM_GPS_PATH := device/samsung/msm7627a-common/gps
