@@ -17,6 +17,8 @@ allow sensord input_device:dir search;
 allow sensord netmgrd:dir search;
 allow sensord netmgrd:file read;
 allow sensord installd:dir search;
+allow sensord sysfs:file { open read };
+allow sensord system_data_file:file read;
 
 init_daemon_domain(sensord)
 

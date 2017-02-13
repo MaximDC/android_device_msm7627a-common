@@ -56,3 +56,10 @@ allow untrusted_app vold:dir search;
 allow untrusted_app wpa:dir search;
 allow untrusted_app zygote:file read;
 allow untrusted_app media_rw_data_file:file execute;
+allow untrusted_app block_device:dir { open read };
+allow untrusted_app device:dir { open read };
+allow untrusted_app efs_file:dir getattr;
+allow untrusted_app rootfs:dir { open read };
+allow untrusted_app sysfs:file { getattr open read };
+allow untrusted_app unlabeled:dir getattr;
+

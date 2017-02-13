@@ -1,4 +1,5 @@
 allow netmgrd netmgrd_exec:file execmod;
 allow netmgrd system_file:file execmod;
 allow netmgrd self:packet_socket { create bind write read };
+allow netmgrd self:capability dac_override;
 

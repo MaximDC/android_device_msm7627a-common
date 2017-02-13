@@ -1,0 +1,2 @@
+allow audioserver self:capability sys_nice;
+

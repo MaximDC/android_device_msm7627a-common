@@ -1,16 +1,16 @@
-From d3b3b2aed3b0c3c2bccc47ac5b1c556bcb448d6d Mon Sep 17 00:00:00 2001
+From 3157aeb852683043b69d488d8e70a997efe2d476 Mon Sep 17 00:00:00 2001
 From: grace5921 <androidlover5842@gmail.com>
-Date: Thu, 9 Feb 2017 22:37:26 +0530
+Date: Mon, 13 Feb 2017 15:13:11 +0530
 Subject: [PATCH] disable some never allows
 
-Change-Id: I858ec9dbdbc806eadc1a5417da7f9fff417b6823
+Change-Id: I53a312bfe453b90325956f3dc357ffccaa812879
 ---
  app.te           |  28 +++++------
  domain.te        | 138 +++++++++++++++++++++++++++----------------------------
  init.te          |   2 +-
- system_server.te |   8 ++--
+ system_server.te |  10 ++--
  untrusted_app.te |  18 ++++----
- 5 files changed, 97 insertions(+), 97 deletions(-)
+ 5 files changed, 98 insertions(+), 98 deletions(-)
 
 diff --git a/app.te b/app.te
 index 19a7dac..d3728a9 100644
@@ -296,11 +296,15 @@ index 75c3dfa..7619a14 100644
  # Init never adds or uses services via service_manager.
  neverallow init service_manager_type:service_manager { add find };
 diff --git a/system_server.te b/system_server.te
-index 03a7ef3..577e196 100644
+index 03a7ef3..8bf00ae 100644
 --- a/system_server.te
 +++ b/system_server.te
-@@ -564,10 +564,10 @@ neverallow system_server { bluetooth_data_file nfc_data_file shell_data_file app
- neverallow system_server dex2oat_exec:file no_x_file_perms;
+@@ -561,13 +561,13 @@ neverallow system_server { bluetooth_data_file nfc_data_file shell_data_file app
+ # a bug (for example, bug 16317188), or represents an attempt by
+ # system server to dynamically load a dex file, something we do not
+ # want to allow.
+-neverallow system_server dex2oat_exec:file no_x_file_perms;
++#neverallow system_server dex2oat_exec:file no_x_file_perms;
  
  # system_server should never execute anything from /data except for /data/dalvik-cache files.
 -neverallow system_server {

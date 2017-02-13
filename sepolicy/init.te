@@ -25,3 +25,5 @@ allow init audio_device:chr_file write;
 allow init self:netlink_route_socket bind;
 allow init audio_device:chr_file ioctl;
 allow init self:netlink_socket create;
+allow init debugfs:file write;
+

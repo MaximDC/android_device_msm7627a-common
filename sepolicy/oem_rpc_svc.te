@@ -8,6 +8,7 @@ allow oem_rpc_svc smem_log_device:chr_file { read write ioctl open };
 allow oem_rpc_svc system_data_file:dir { write remove_name add_name };
 allow oem_rpc_svc system_file:file execmod;
 allow oem_rpc_svc system_data_file:sock_file { create unlink };
+allow oem_rpc_svc diag_device:chr_file { open read write };
 
 init_daemon_domain(oem_rpc_svc)
 
