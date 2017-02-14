@@ -84,7 +84,6 @@ DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_delos
 else
 DEVICE_PACKAGE_OVERLAYS += device/samsung/msm7627a-common/overlay_arubaslim
 endif
-KERNEL_HAS_FINIT_MODULE := false
 
 # Hardware rendering
 BOARD_EGL_WORKAROUND_BUG_10194508 := true
@@ -236,7 +235,7 @@ BOARD_WPA_SUPPLICANT_DRIVER := NL80211
 BOARD_HOSTAPD_DRIVER := NL80211
 WPA_SUPPLICANT_VERSION := VER_0_8_X
 BOARD_HAS_ATH_WLAN := true
-BOARD_WLAN_DEVICE := ath6kl
+BOARD_WLAN_DEVICE := qcwcn
 WIFI_DRIVER_IFACE_NAME := "wlan"
 WIFI_PARAMS += WIFI_MAC_FROM_NV="true"
 
@@ -259,7 +258,8 @@ WIFI_DRIVER_MODULE_NAME := "ath6kl_sdio"
 WIFI_EXT_MODULE_PATH := "/system/lib/modules/cfg80211.ko"
 WIFI_EXT_MODULE_NAME := "cfg80211"
 WIFI_DRIVER_FW_PATH_PARAM := "/data/misc/wifi/fwpath"
-
+KERNEL_HAS_FINIT_MODULE := false
+BOARD_GLOBAL_CFLAGS := -DNO_FINIT_MODULE
 
 # Enable dex-preoptimization to speed up first boot sequence
 ifeq ($(HOST_OS),linux)
