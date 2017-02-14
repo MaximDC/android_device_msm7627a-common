@@ -1,0 +1,256 @@
+From d875f27dab98a7fa2ef4b51ee09a1a467c3c526e Mon Sep 17 00:00:00 2001
+From: grace5921 <androidlover5842@gmail.com>
+Date: Tue, 14 Feb 2017 15:24:39 +0530
+Subject: [PATCH] Bug: work around reboot issue
+
+ this new fucking hal isn't supported by our brand old device lol so we need to suck with old wifi until we find any new way to fix this
+
+Change-Id: Iccd8c37ee430c6e8168d3ccc8116c13ce8cf9c89
+---
+ wifi/Android.mk |  1 -
+ wifi/wifi.c     | 38 ++---------------------------------
+ wifi/wifi_fst.c | 61 ++++++++++++---------------------------------------------
+ 3 files changed, 15 insertions(+), 85 deletions(-)
+
+diff --git a/wifi/Android.mk b/wifi/Android.mk
+index 1242cc3..1bff7d8 100644
+--- a/wifi/Android.mk
++++ b/wifi/Android.mk
+@@ -74,7 +74,6 @@ endif
+ 
+ ifeq ($(BOARD_HAVE_SAMSUNG_WIFI),true)
+ LOCAL_CFLAGS += -DSAMSUNG_WIFI
+-LOCAL_C_INCLUDES += hardware/samsung/macloader/include
+ endif
+ 
+ LOCAL_SHARED_LIBRARIES += libnetutils
+diff --git a/wifi/wifi.c b/wifi/wifi.c
+index f53b9bc..c13131e 100644
+--- a/wifi/wifi.c
++++ b/wifi/wifi.c
+@@ -23,10 +23,6 @@
+ #include <sys/stat.h>
+ #include <unistd.h>
+ #include <poll.h>
+-#ifndef NO_FINIT_MODULE
+-#include <sys/syscall.h>
+-#endif
+-
+ 
+ #ifdef USES_TI_MAC80211
+ #include <dirent.h>
+@@ -55,10 +51,6 @@
+ #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+ #include <sys/_system_properties.h>
+ 
+-#ifdef SAMSUNG_WIFI
+-#include <samsung_macloader.h>
+-#endif
+-
+ extern int do_dhcp();
+ extern int ifc_init();
+ extern void ifc_close();
+@@ -180,7 +172,7 @@ static char supplicant_prop_name[PROPERTY_KEY_MAX];
+ char* get_samsung_wifi_type()
+ {
+     char buf[10];
+-    int fd = open(CID_PATH, O_RDONLY);
++    int fd = open("/data/.cid.info", O_RDONLY);
+     if (fd < 0)
+         return NULL;
+ 
+@@ -207,28 +199,8 @@ char* get_samsung_wifi_type()
+ }
+ #endif
+ 
+-#ifdef NO_FINIT_MODULE
+-// System call provided by bionic but not in any header file.
+-extern int init_module(void *, unsigned long, const char *);
+-#endif
+-
+ int insmod(const char *filename, const char *args)
+ {
+-#ifndef NO_FINIT_MODULE
+-     /* O_NOFOLLOW is removed as wlan.ko is symlink pointing to
+-        the vendor specfic file which is in readonly location */
+-     int fd = open(filename, O_RDONLY | O_CLOEXEC);
+-     if (fd == -1) {
+-        ALOGD("insmod: open(\"%s\") failed: %s", filename, strerror(errno));
+-        return -1;
+-     }
+-     int rc = syscall(__NR_finit_module, fd, args, 0);
+-     if (rc == -1) {
+-       ALOGD("finit_module for \"%s\" failed: %s", filename, strerror(errno));
+-     }
+-     close(fd);
+-     return rc;
+-#else
+     void *module;
+     unsigned int size;
+     int ret;
+@@ -242,7 +214,6 @@ int insmod(const char *filename, const char *args)
+     free(module);
+ 
+     return ret;
+-#endif
+ }
+ 
+ int rmmod(const char *modname)
+@@ -336,7 +307,7 @@ int is_wifi_driver_loaded() {
+     while ((fgets(line, sizeof(line), proc)) != NULL) {
+         if (strncmp(line, DRIVER_MODULE_TAG, strlen(DRIVER_MODULE_TAG)) == 0) {
+             fclose(proc);
+-            return 1;
++            return is_fst_driver_loaded();
+         }
+     }
+     fclose(proc);
+@@ -353,11 +324,6 @@ int wifi_load_driver()
+     char driver_status[PROPERTY_VALUE_MAX];
+     int count = 100; /* wait at most 20 seconds for completion */
+     char module_arg2[256];
+-
+-    if (is_wifi_driver_loaded()) {
+-        return wifi_fst_load_driver();
+-    }
+-
+ #ifdef SAMSUNG_WIFI
+     char* type = get_samsung_wifi_type();
+ 
+diff --git a/wifi/wifi_fst.c b/wifi/wifi_fst.c
+index 286edbd..3950ba5 100644
+--- a/wifi/wifi_fst.c
++++ b/wifi/wifi_fst.c
+@@ -43,9 +43,10 @@
+ static const char WIFI_FST_DRIVER_MODULE_TAG[] = WIFI_FST_DRIVER_MODULE_NAME " ";
+ static const char FST_DRIVER_PROP_NAME[] = "wlan.fst.driver.status";
+ 
+-static const char FSTMAN_IFNAME[] = "wlan0";
++static const char SUPPLICANT_GLOBAL_CTRL_IFACE[] = "@android:wpa_wlan0";
+ static const char FSTMAN_NAME[] = "fstman";
+ static const char FSTMAN_START_PROP_NAME[] = "netd.fstman.start";
++static const char FSTMAN_PROP_NAME[] = "init.svc.fstman";
+ static const char FSTMAN_CONFIG_TEMPLATE[] = "/system/etc/wifi/fstman.ini";
+ static const char FSTMAN_CONFIG_FILE[] = "/data/misc/wifi/fstman.ini";
+ static const char FST_RATE_UPGRADE_ENABLED_PROP_NAME[] = "persist.fst.rate.upgrade.en";
+@@ -53,18 +54,6 @@ static const char FST_SOFTAP_ENABLED_PROP_NAME[] = "persist.fst.softap.en";
+ 
+ static const char MODULE_FILE[] = "/proc/modules";
+ 
+-#if __cplusplus
+-extern "C" {
+-#endif
+-
+-extern int insmod(const char *filename, const char *args);
+-extern int rmmod(const char *modname);
+-extern int ensure_config_file_exists(const char *config_file, const char *config_file_template);
+-
+-#if __cplusplus
+-};  // extern "C"
+-#endif
+-
+ int is_fst_enabled()
+ {
+     char prop_value[PROPERTY_VALUE_MAX] = { '\0' };
+@@ -163,41 +152,22 @@ int wifi_fst_unload_driver()
+     return -1;
+ }
+ 
+-static void get_fstman_props(int softap_mode,
+-			     char *fstman_svc_name, int fstman_svc_name_len,
+-			     char *fstman_init_prop, int fstman_init_prop_len)
+-{
+-    if (softap_mode)
+-        strlcpy(fstman_svc_name, FSTMAN_NAME, fstman_svc_name_len);
+-    else
+-        snprintf(fstman_svc_name, fstman_svc_name_len, "%s_%s",
+-                 FSTMAN_NAME, FSTMAN_IFNAME);
+-    snprintf(fstman_init_prop, fstman_init_prop_len, "init.svc.%s",
+-             fstman_svc_name);
+-}
+-
+ int wifi_start_fstman(int softap_mode)
+ {
+     char fstman_status[PROPERTY_VALUE_MAX] = { '\0' };
+-    char fstman_svc_name[PROPERTY_VALUE_MAX] = { '\0' };
+-    char fstman_init_prop[PROPERTY_VALUE_MAX] = { '\0' };
++    char fstman_start_cmd[PROPERTY_VALUE_MAX] = { '\0' };
+     int count = 50; /* wait at most 5 seconds for completion */
+ 
+-    if (!is_fst_enabled() ||
+-        (softap_mode && !is_fst_softap_enabled())) {
++    if (!is_fst_enabled())
+         return 0;
+-    }
+ 
+     if (ensure_config_file_exists(FSTMAN_CONFIG_FILE, FSTMAN_CONFIG_TEMPLATE) < 0) {
+         ALOGE("Failed to create fstman config file");
+         return -1;
+     }
+ 
+-    get_fstman_props(softap_mode, fstman_svc_name, sizeof(fstman_svc_name),
+-                     fstman_init_prop, sizeof(fstman_init_prop));
+-
+     /* Check whether already running */
+-    if (property_get(fstman_init_prop, fstman_status, NULL) &&
++    if (property_get(FSTMAN_PROP_NAME, fstman_status, NULL) &&
+         strcmp(fstman_status, "running") == 0)
+         return 0;
+ 
+@@ -207,12 +177,14 @@ int wifi_start_fstman(int softap_mode)
+     if (softap_mode) {
+         property_set(FSTMAN_START_PROP_NAME, "true");
+     } else {
+-        property_set("ctl.start", fstman_svc_name);
++        snprintf(fstman_start_cmd, sizeof(fstman_start_cmd), "%s:%s",
++            FSTMAN_NAME, SUPPLICANT_GLOBAL_CTRL_IFACE);
++        property_set("ctl.start", fstman_start_cmd);
+     }
+     sched_yield();
+ 
+     while (count-- > 0) {
+-        if (property_get(fstman_init_prop, fstman_status, NULL) &&
++        if (property_get(FSTMAN_PROP_NAME, fstman_status, NULL) &&
+             strcmp(fstman_status, "running") == 0)
+                 return 0;
+         usleep(100000);
+@@ -225,20 +197,13 @@ int wifi_start_fstman(int softap_mode)
+ int wifi_stop_fstman(int softap_mode)
+ {
+     char fstman_status[PROPERTY_VALUE_MAX] = { '\0' };
+-    char fstman_svc_name[PROPERTY_VALUE_MAX] = { '\0' };
+-    char fstman_init_prop[PROPERTY_VALUE_MAX] = { '\0' };
+     int count = 50; /* wait at most 5 seconds for completion */
+ 
+-    if (!is_fst_enabled() ||
+-        (softap_mode && !is_fst_softap_enabled())) {
++    if (!is_fst_enabled())
+         return 0;
+-    }
+-
+-    get_fstman_props(softap_mode, fstman_svc_name, sizeof(fstman_svc_name),
+-                     fstman_init_prop, sizeof(fstman_init_prop));
+ 
+     /* Check whether already stopped */
+-    if (property_get(fstman_init_prop, fstman_status, NULL) &&
++    if (property_get(FSTMAN_PROP_NAME, fstman_status, NULL) &&
+         strcmp(fstman_status, "stopped") == 0)
+         return 0;
+ 
+@@ -248,11 +213,11 @@ int wifi_stop_fstman(int softap_mode)
+     if (softap_mode)
+         property_set(FSTMAN_START_PROP_NAME, "false");
+     else
+-        property_set("ctl.stop", fstman_svc_name);
++        property_set("ctl.stop", FSTMAN_NAME);
+     sched_yield();
+ 
+     while (count-- > 0) {
+-        if (property_get(fstman_init_prop, fstman_status, NULL) &&
++        if (property_get(FSTMAN_PROP_NAME, fstman_status, NULL) &&
+             strcmp(fstman_status, "stopped") == 0)
+                 return 0;
+         usleep(100000);
+-- 
+2.11.0
+
