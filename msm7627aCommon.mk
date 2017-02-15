@@ -76,6 +76,7 @@ PRODUCT_PACKAGES += libstagefrighthw
 PRODUCT_PACKAGES += gps.msm7x27a
 PRODUCT_PACKAGES += camera.msm7x27a 
 PRODUCT_PACKAGES += Camera2
+PRODUCT_PACKAGES += libshims
 PRODUCT_PACKAGES += lights.msm7x27a
 #PRODUCT_PACKAGES += libhealthd.msm7x27a
 
@@ -102,6 +103,9 @@ PRODUCT_PACKAGES += com.android.future.usb.accessory
 PRODUCT_PACKAGES += hwmac
 PRODUCT_PACKAGES += make_ext4fs
 PRODUCT_PACKAGES += setup_fs
+PRODUCT_PACKAGES += mkfs.f2fs 
+PRODUCT_PACKAGES += fsck.f2fs
+PRODUCT_PACKAGES += fibmap.f2fs
 
 # EGL
 PRODUCT_PACKAGES += libstlport
