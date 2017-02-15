@@ -17,6 +17,9 @@ allow sensord input_device:dir search;
 allow sensord netmgrd:dir search;
 allow sensord netmgrd:file read;
 allow sensord installd:dir search;
+allow sensord rild:dir search;
+allow sensord rild:file { read open };
+allow sensord rild:lnk_file read;
 
 init_daemon_domain(sensord)
 
