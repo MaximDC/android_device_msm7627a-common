@@ -18,6 +18,7 @@ lunch lineage_delos3geur-userdebug
 }
 function arubaslim
 {
+export WITH_SU=true
 lunch lineage_arubaslim-userdebug
 make -j4 bacon
 }
