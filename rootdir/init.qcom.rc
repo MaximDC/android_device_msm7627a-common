@@ -40,6 +40,7 @@ on init
 
     mkdir /efs
     mkdir /persist
+    export LD_SHIM_LIBS "/system/lib/hw/camera.msm7x27a.so|libshim_native.so"
 
 on fs
     # mount mmc partitions
