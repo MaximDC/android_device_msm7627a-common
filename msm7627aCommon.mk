@@ -77,6 +77,7 @@ PRODUCT_PACKAGES += gps.msm7x27a
 PRODUCT_PACKAGES += camera.msm7x27a 
 PRODUCT_PACKAGES += Camera2
 PRODUCT_PACKAGES += libshim_native
+PRODUCT_PACKAGES += libshim_skia
 PRODUCT_PACKAGES += lights.msm7x27a
 #PRODUCT_PACKAGES += libhealthd.msm7x27a
 
