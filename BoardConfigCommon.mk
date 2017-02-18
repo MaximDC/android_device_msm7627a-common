@@ -201,7 +201,7 @@ TARGET_RIL_VARIANT := legacy
 BOARD_GLOBAL_CFLAGS += -DRIL_SUPPORTS_SEEK
 BOARD_GLOBAL_CFLAGS += -DRIL_VARIANT_LEGACY
 BOARD_RIL_CLASS := ../../../device/samsung/msm7627a-common/ril/
-
+TARGET_NEEDS_BIONIC_PRELINK_SUPPORT := true
 # Hardware
 #BOARD_HARDWARE_CLASS := device/samsung/msm7627a-common/cmhw
 
