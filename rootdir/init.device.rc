@@ -31,9 +31,8 @@ on init
     # write /sys/module/msm_fb/parameters/align_buffer 1
 
 on post-fs
-    exec /system/bin/sh /system/etc/init.qcom.thermald_conf.sh
 
-service thermald /system/bin/thermald
+service thermald /system/bin/thermald -c /system/etc/thermald.conf
    class late_start
    user root
    group root

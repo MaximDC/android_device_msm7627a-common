@@ -1,0 +1,39 @@
+From b2b7cd1b9fe6e2cd5583b6cf6e873cee74cb0829 Mon Sep 17 00:00:00 2001
+From: grace5921 <androidlover5842@gmail.com>
+Date: Thu, 16 Feb 2017 22:34:05 +0530
+Subject: [PATCH] Revert "bionic: linker: Load shim libs *before* the
+ self-linked libs"
+
+This reverts commit 02b1d48d51ffed14442390c80e773f3ac89396ff.
+---
+ linker/linker.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/linker/linker.cpp b/linker/linker.cpp
+index 99c02d810..2cd3bf2a0 100644
+--- a/linker/linker.cpp
++++ b/linker/linker.cpp
+@@ -980,16 +980,16 @@ static bool walk_dependencies_tree(soinfo* root_soinfos[], size_t root_soinfos_s
+ 
+     visited.push_back(si);
+ 
++    si->get_children().for_each([&](soinfo* child) {
++      visit_list.push_back(child);
++    });
++
+     if (do_shims) {
+       shim_libs_for_each(si->get_realpath(), [&](soinfo* child) {
+         si->add_child(child);
+         visit_list.push_back(child);
+       });
+     }
+-
+-    si->get_children().for_each([&](soinfo* child) {
+-      visit_list.push_back(child);
+-    });
+   }
+ 
+   return true;
+-- 
+2.11.0
+
