@@ -32,7 +32,6 @@ PRODUCT_PACKAGES += viewmem
 
 # Rootdir
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/lpm.rc:root/lpm.rc
-PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/init.qcom.bt.rc:root/init.qcom.bt.rc
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/init.device.rc:root/init.device.rc
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/fstab.qcom:root/fstab.qcom
 PRODUCT_COPY_FILES += device/samsung/msm7627a-common/rootdir/init.qcom.rc:root/init.qcom.rc
