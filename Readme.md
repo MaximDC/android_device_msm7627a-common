@@ -32,6 +32,12 @@ Device tree for Galaxy Win GT-I8552 (2 SIM)
 <project path="hardware/atheros/wlan" name="CM13-Y300/android_hardware_atheros_wlan" remote="github" revision="cm-13.0" />
 <project path="hardware/ril-legacy" name="I8552-CM/hardware_ril-legacy" revision="cm-14.1" />
 <project path="external/stlport" name="LineageOS/android_external_stlport" revision="cm-14.1" />
+
+<!--Bluetooth-->
+<project path="external/bluetooth" name="I8552-CM/external_bluetooth" revision="cm-14.1" />
+<project path="external/dbus" name="I8552-CM/external_dbus" revision="cm-13.0" />
+<project path="system/bluetooth" name="I8552-CM/system_bluetooth" revision="cm-13.0" />
+
 </manifest>
 ```
 
