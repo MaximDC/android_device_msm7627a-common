@@ -33,11 +33,8 @@ on init
 on post-fs
 
 service thermald /system/bin/thermald -c /system/etc/thermald.conf
-   class late_start
-   user root
-   group root
-   disabled
-
+    class main
+   
 on boot
    start qcamerasvr
    #start gpu_dcvsd
@@ -114,9 +111,7 @@ service gps_check /system/bin/gps_check
 #    disabled
 
 service mpdecision /system/bin/mpdecision --no_sleep --avg_comp
-    class late_start
-    disabled
-    user root
+    class main
 
 service gpu_dcvsd /system/bin/gpu_dcvsd
     class late_start
