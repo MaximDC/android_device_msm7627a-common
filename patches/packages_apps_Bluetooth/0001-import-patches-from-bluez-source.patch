@@ -1,0 +1,79 @@
+From 6a510e49b1a60a56c9d31d390ff1b92890b57eb8 Mon Sep 17 00:00:00 2001
+From: grace5921 <androidlover5842@gmail.com>
+Date: Sat, 25 Feb 2017 20:31:10 +0530
+Subject: [PATCH] import patches from bluez source
+
+Change-Id: Ia7e665a65c277267b3665f473bda1cc2ae93ba2e
+---
+ src/com/android/bluetooth/gatt/GattService.java             |  2 +-
+ src/com/android/bluetooth/hfp/HeadsetStateMachine.java      |  2 +-
+ src/com/android/bluetooth/map/BluetoothMapObexServer.java   |  2 +-
+ src/com/android/bluetooth/pbap/BluetoothPbapObexServer.java | 13 +++++++++++--
+ 4 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/src/com/android/bluetooth/gatt/GattService.java b/src/com/android/bluetooth/gatt/GattService.java
+index b0322649..32ed1846 100644
+--- a/src/com/android/bluetooth/gatt/GattService.java
++++ b/src/com/android/bluetooth/gatt/GattService.java
+@@ -853,7 +853,7 @@ public class GattService extends ProfileService {
+             // Find additional included services
+             gattClientGetIncludedServiceNative(connId,
+                 srvcType, srvcInstId, srvcUuidLsb, srvcUuidMsb,
+-                inclSrvcType, inclSrvcInstId, inclSrvcUuidLsb, inclSrvcUuidMsb);
++                inclSrvcInstId, inclSrvcType, inclSrvcUuidLsb, inclSrvcUuidMsb);
+         } else {
+             // Discover descriptors now
+             continueSearch(connId, 0);
+diff --git a/src/com/android/bluetooth/hfp/HeadsetStateMachine.java b/src/com/android/bluetooth/hfp/HeadsetStateMachine.java
+index e1de28e5..78ccab50 100644
+--- a/src/com/android/bluetooth/hfp/HeadsetStateMachine.java
++++ b/src/com/android/bluetooth/hfp/HeadsetStateMachine.java
+@@ -3365,7 +3365,7 @@ final class HeadsetStateMachine extends StateMachine {
+                             "using IBluetoothHeadsetPhone proxy");
+                         phoneNumber = "";
+                     }
+-                    clccResponseNative(1, 0, 0, 0, false, phoneNumber, type,
++                    clccResponseNative(1, 0, 0, 0, false, "", 0,
+                                                        getByteAddress(device));
+                     clccResponseNative(0, 0, 0, 0, false, "", 0, getByteAddress(device));
+                 }
+diff --git a/src/com/android/bluetooth/map/BluetoothMapObexServer.java b/src/com/android/bluetooth/map/BluetoothMapObexServer.java
+index fe020705..0d77c73e 100644
+--- a/src/com/android/bluetooth/map/BluetoothMapObexServer.java
++++ b/src/com/android/bluetooth/map/BluetoothMapObexServer.java
+@@ -427,7 +427,7 @@ public class BluetoothMapObexServer extends ServerRequestHandler {
+                 if (mAccount!= null && mAccount.getType() == TYPE.EMAIL &&
+                         (mOutContent instanceof BluetoothMapContentEmail)) {
+                     ((BluetoothMapContentEmail)mOutContent).msgUpdate();
+-                     return ResponseCodes.OBEX_HTTP_OK;
++                     return ResponseCodes.OBEX_HTTP_NOT_IMPLEMENTED;
+                 }
+                 return updateInbox();
+             }else if(type.equals(TYPE_SET_NOTIFICATION_REGISTRATION)) {
+diff --git a/src/com/android/bluetooth/pbap/BluetoothPbapObexServer.java b/src/com/android/bluetooth/pbap/BluetoothPbapObexServer.java
+index 73fab12c..09074ebb 100644
+--- a/src/com/android/bluetooth/pbap/BluetoothPbapObexServer.java
++++ b/src/com/android/bluetooth/pbap/BluetoothPbapObexServer.java
+@@ -393,8 +393,17 @@ public class BluetoothPbapObexServer extends ServerRequestHandler {
+             // we have weak name checking here to provide better
+             // compatibility with other devices,although unique name such as
+             // "pb.vcf" is required by SIG spec.
+-            if (((name.contains(PB.subSequence(0, PB.length())) &&
+-                 name.contains(SIM1.subSequence(0, SIM1.length()))) &&
++
++            // Extract file name
++            String fileName = name;
++
++            if (name.contains("/")) {
++                fileName = name.substring(name.lastIndexOf("/") + 1);
++                fileName = fileName.substring(0, fileName.lastIndexOf('.'));
++            }
++
++            if (((fileName.contains(PB.subSequence(0, PB.length())) &&
++                 fileName.contains(SIM1.subSequence(0, SIM1.length()))) &&
+                 (type.equals(TYPE_PB))) ||
+                 (((name.contains(PB.subSequence(0, PB.length()))) &&
+                 (mCurrentPath.equals(SIM_PATH))) && (type.equals(TYPE_LISTING))))
+-- 
+2.11.0
+
