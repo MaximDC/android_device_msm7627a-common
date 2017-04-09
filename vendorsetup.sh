@@ -1,5 +1,3 @@
-/bin/cp device/samsung/msm7627a-common/post_process_props_hook.py build/tools/
-chmod  0775 build/tools/post_process_props_hook.py
 sh device/samsung/msm7627a-common/patches/apply.sh
 
 if [ ! -f vendor/samsung/msm7627a-common/proprietary/app/app-debug.apk ]; then

@@ -1,4 +1,4 @@
-From 0fbe4af1eabcb9125ba20fe1047b14cad7f72f88 Mon Sep 17 00:00:00 2001
+From ab714a243ab495f0092277af83422cd7e5984ce1 Mon Sep 17 00:00:00 2001
 From: weritos6666 <weritos94@gmail.com>
 Date: Fri, 4 Mar 2016 14:15:34 +0500
 Subject: [PATCH] Fix_wifi_Hotspot
@@ -9,7 +9,7 @@ Subject: [PATCH] Fix_wifi_Hotspot
  2 files changed, 7 insertions(+), 26 deletions(-)
 
 diff --git a/server/Android.mk b/server/Android.mk
-index 26beffa..e32912f 100644
+index e70ad95..ebed104 100644
 --- a/server/Android.mk
 +++ b/server/Android.mk
 @@ -19,7 +19,7 @@ LOCAL_PATH := $(call my-dir)
@@ -30,7 +30,7 @@ index 26beffa..e32912f 100644
  LOCAL_MODULE := netd
  
  LOCAL_INIT_RC := netd.rc
-@@ -131,7 +131,7 @@ include $(BUILD_EXECUTABLE)
+@@ -132,7 +132,7 @@ include $(BUILD_EXECUTABLE)
  ###
  include $(CLEAR_VARS)
  
@@ -39,7 +39,7 @@ index 26beffa..e32912f 100644
  LOCAL_CLANG := true
  LOCAL_MODULE := ndc
  LOCAL_SHARED_LIBRARIES := libcutils
-@@ -144,7 +144,7 @@ include $(BUILD_EXECUTABLE)
+@@ -145,7 +145,7 @@ include $(BUILD_EXECUTABLE)
  ###
  include $(CLEAR_VARS)
  LOCAL_MODULE := netd_unit_test
@@ -49,7 +49,7 @@ index 26beffa..e32912f 100644
          system/netd/include \
          system/netd/server \
 diff --git a/server/SoftapController.cpp b/server/SoftapController.cpp
-index 27ed684..fd696dd 100755
+index 1c59ec3..de38b5b 100755
 --- a/server/SoftapController.cpp
 +++ b/server/SoftapController.cpp
 @@ -60,7 +60,6 @@ static const char HOSTAPD_DHCP_DIR[]    = "/data/misc/dhcp";
@@ -60,14 +60,15 @@ index 27ed684..fd696dd 100755
  
  SoftapController::SoftapController()
      : mPid(0) {}
-@@ -155,35 +154,17 @@ void *SoftapController::threadStart(void *obj){
- int SoftapController::startSoftap(bool global_ctrl_iface, SocketClient *socketClient = NULL) {
+@@ -156,7 +155,6 @@ int SoftapController::startSoftap(bool global_ctrl_iface, SocketClient *socketCl
+     const char *ifname) {
      pid_t pid = 1;
      DIR *dir = NULL;
 -    int ret;
  
+     mSocketClient = socketClient;
      if (mPid) {
-         ALOGE("SoftAP is already running");
+@@ -164,28 +162,11 @@ int SoftapController::startSoftap(bool global_ctrl_iface, SocketClient *socketCl
          return ResponseCode::SoftapStatusResult;
      }
  
@@ -100,5 +101,5 @@ index 27ed684..fd696dd 100755
          }
          ALOGE("SoftAP failed to start");
 -- 
-2.11.0
+2.7.4
 
