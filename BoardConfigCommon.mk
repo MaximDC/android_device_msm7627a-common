@@ -32,7 +32,7 @@ DISABLE_DEXPREOPT := true
 # Compiler flags
 TARGET_GLOBAL_CFLAGS += -mtune=cortex-a9 -mfpu=neon-vfpv4 -mfloat-abi=softfp
 TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a9 -mfpu=neon-vfpv4 -mfloat-abi=softfp
-TARGET_SPECIFIC_HEADER_PATH := device/samsung/msm7627a-common/include
+#TARGET_SPECIFIC_HEADER_PATH := device/samsung/msm7627a-common/include
 
 # Qualcomm hardware
 BOARD_USES_QCOM_HARDWARE := true
