@@ -255,15 +255,6 @@ WIFI_EXT_MODULE_NAME := "cfg80211"
 WIFI_DRIVER_FW_PATH_PARAM := "/data/misc/wifi/fwpath"
 KERNEL_HAS_FINIT_MODULE := false
 BOARD_GLOBAL_CFLAGS := -DNO_FINIT_MODULE
-
-# Enable dex-preoptimization to speed up first boot sequence
-ifeq ($(HOST_OS),linux)
-  ifeq ($(TARGET_BUILD_VARIANT),userdebug)
-    ifeq ($(WITH_DEXPREOPT),)
-      WITH_DEXPREOPT := true
-    endif
-  endif
-endif
 #WITH_DEXPREOPT_PIC := true
 #DONT_DEXPREOPT_PREBUILTS := true
 
